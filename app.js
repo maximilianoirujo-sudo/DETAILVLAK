@@ -221,13 +221,21 @@ function setActiveUser(userName) {
 
 function applyActiveUserUI() {
   const isMaxi = appState.config.activeUser === "Maximiliano";
+  const isRomi = appState.config.activeUser === "Romina";
+
+  // Cambiar tema de la app: "romina" (negro y rosa) o "maxi" (monocromático blanco y negro)
+  document.documentElement.setAttribute("data-operator", isRomi ? "romina" : "maxi");
+
   const btnMaxi = document.getElementById("btn-user-maxi");
   const btnRomi = document.getElementById("btn-user-romi");
 
   if (btnMaxi && btnRomi) {
     btnMaxi.classList.toggle("active", isMaxi);
-    btnRomi.classList.toggle("active", !isMaxi);
+    btnRomi.classList.toggle("active", isRomi);
   }
+
+  // Re-renderizar lista para actualizar chips y acentos
+  renderLeads();
 }
 
 // ================= SINCRONIZACIÓN CON GOOGLE SHEETS =================
@@ -517,13 +525,13 @@ function renderLeads() {
         <div class="pt-3 border-t border-mono-800 flex items-center justify-between gap-2">
           
           <div class="flex items-center gap-2 text-[11px] font-display">
-            <span class="w-2 h-2 rounded-full bg-white"></span>
+            <span class="w-2 h-2 rounded-full ${lead.assignedTo === 'Romina' ? 'bg-[#ff2d78]' : 'bg-white'}"></span>
             <span class="font-bold text-mono-300">${lead.assignedTo || 'Sin asignar'}</span>
             ${lead.quotedTotal > 0 ? `<span class="font-serif font-black text-white ml-1 text-sm">$${lead.quotedTotal.toLocaleString('es-UY')}</span>` : ''}
           </div>
 
-          <!-- Botón de Acción -->
-          <button onclick="openModalCotizador('${lead.id}')" class="px-3.5 py-1.5 bg-white hover:bg-mono-200 active:scale-95 text-black font-display font-extrabold text-xs rounded-xl shadow-md shadow-white/5 flex items-center gap-1.5 transition">
+          <!-- Botón de Acción dinámico -->
+          <button onclick="openModalCotizador('${lead.id}')" class="btn-action-primary px-3.5 py-1.5 active:scale-95 font-display font-extrabold text-xs rounded-xl flex items-center gap-1.5 transition">
             <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
             <span>${lead.quotedTotal > 0 ? 'Ver Cotización' : 'Cotizar'}</span>
           </button>
@@ -548,7 +556,7 @@ function getStatusBadge(status) {
     case "COTIZADO":
       return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-800 text-mono-200 border border-mono-700">Cotizado</span>`;
     case "TURNO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-white text-black font-black">Turno Agendado</span>`;
+      return `<span class="brand-badge px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest font-black">Turno Agendado</span>`;
     case "FINALIZADO":
       return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-800 text-mono-400 border border-mono-700">Finalizado</span>`;
     case "CANCELADO":

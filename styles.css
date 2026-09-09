@@ -1,10 +1,32 @@
-/* DetailVlak - Monochrome CarVlak Aesthetic Styles */
+/* DetailVlak - Monochrome CarVlak & Romina Black/Pink Theme */
 
 :root {
   --font-sans: 'Instrument Sans', system-ui, -apple-system, sans-serif;
   --font-serif: 'Piazzolla', Georgia, serif;
   --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'Space Mono', monospace;
+
+  /* Colores Maxi por defecto (Monocromático Blanco y Negro) */
+  --accent-color: #ffffff;
+  --accent-text: #000000;
+  --accent-hover: #e4e4e7;
+  --accent-glow: rgba(255, 255, 255, 0.15);
+  --accent-border: rgba(255, 255, 255, 0.3);
+  --accent-subtle: rgba(255, 255, 255, 0.1);
+  --badge-bg: #ffffff;
+  --badge-text: #000000;
+}
+
+/* TEMA ROMINA: Mayoritariamente Negro con acentos en Rosa Eléctrico / Rose Gold */
+[data-operator="romina"] {
+  --accent-color: #ff2d78;
+  --accent-text: #ffffff;
+  --accent-hover: #ff4d8f;
+  --accent-glow: rgba(255, 45, 120, 0.35);
+  --accent-border: rgba(255, 45, 120, 0.4);
+  --accent-subtle: rgba(255, 45, 120, 0.12);
+  --badge-bg: #ff2d78;
+  --badge-text: #ffffff;
 }
 
 body {
@@ -14,13 +36,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  transition: background-color 0.3s ease;
 }
 
 h1, h2, h3, .font-heading {
   font-family: var(--font-serif);
 }
 
-/* Custom Scrollbar - Monochrome */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -36,18 +59,59 @@ h1, h2, h3, .font-heading {
   background: #52525b;
 }
 
-/* Operadores (Maxi / Romi) - Pure Black & White */
+/* Brand Logo Box */
+.brand-logo-box {
+  background-color: var(--accent-color);
+  color: var(--accent-text);
+  box-shadow: 0 2px 12px var(--accent-glow);
+  transition: all 0.25s ease;
+}
+
+.brand-badge {
+  background-color: var(--accent-color);
+  color: var(--accent-text);
+  transition: all 0.25s ease;
+}
+
+/* Operadores Switcher */
 .user-btn {
   color: #a1a1aa;
+  transition: all 0.2s ease;
 }
-.user-btn.active {
+
+/* Maxi Activo */
+[data-operator="maxi"] #btn-user-maxi.active,
+#btn-user-maxi.active {
   background-color: #ffffff;
   color: #000000;
   font-weight: 800;
   box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
 }
-.user-btn.active span {
+[data-operator="maxi"] #btn-user-maxi.active span,
+#btn-user-maxi.active span {
   background-color: #000000;
+}
+
+/* Romi Activo */
+[data-operator="romina"] #btn-user-romi.active {
+  background-color: #ff2d78;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 2px 15px rgba(255, 45, 120, 0.4);
+}
+[data-operator="romina"] #btn-user-romi.active span {
+  background-color: #ffffff;
+}
+
+/* Botón de Acción Principal */
+.btn-action-primary {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+  box-shadow: 0 4px 14px var(--accent-glow) !important;
+  transition: all 0.2s ease;
+}
+.btn-action-primary:hover {
+  background-color: var(--accent-hover) !important;
 }
 
 /* Filter pills */
@@ -63,11 +127,11 @@ h1, h2, h3, .font-heading {
   border-color: #3f3f46;
 }
 .filter-pill.active {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: var(--accent-color);
+  color: var(--accent-text);
+  border-color: var(--accent-color);
   font-weight: 800;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 /* Operator pills */
@@ -83,6 +147,11 @@ h1, h2, h3, .font-heading {
   color: #ffffff;
   font-weight: 700;
 }
+[data-operator="romina"] .op-pill.active {
+  background: rgba(255, 45, 120, 0.2);
+  color: #ff4d8f;
+  border: 1px solid rgba(255, 45, 120, 0.3);
+}
 
 /* Template tabs */
 .template-tab {
@@ -96,11 +165,11 @@ h1, h2, h3, .font-heading {
   color: #ffffff;
 }
 .template-tab.active {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: var(--accent-color);
+  color: var(--accent-text);
+  border-color: var(--accent-color);
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 10px var(--accent-glow);
 }
 
 /* Lead Cards */
@@ -109,8 +178,8 @@ h1, h2, h3, .font-heading {
 }
 .lead-card:hover {
   transform: translateY(-3px);
-  border-color: #52525b;
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-border);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
 }
 
 /* Animations */
@@ -129,14 +198,20 @@ h1, h2, h3, .font-heading {
   animation: modalSlideUp 0.2s ease-out forwards;
 }
 
-/* Checkbox and radio in monochrome */
+/* Checkbox dynamic accent */
 input[type="checkbox"] {
-  accent-color: #ffffff;
+  accent-color: var(--accent-color);
 }
 
-/* Safe touch area for mobile iPhone */
+/* Safe touch area for iPhone */
 @supports (-webkit-touch-callout: none) {
   button, select, input {
     min-height: 38px;
   }
+}
+
+/* Romina specific badge highlight */
+[data-operator="romina"] .highlight-box {
+  border-color: rgba(255, 45, 120, 0.35) !important;
+  box-shadow: 0 0 25px rgba(255, 45, 120, 0.1) !important;
 }

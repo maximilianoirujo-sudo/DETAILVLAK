@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es" class="dark" data-operator="maxi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -77,9 +77,9 @@
   <header class="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-mono-800/80 px-4 py-3.5">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
-      <!-- Brand Logo con tipografía Piazzolla Serif & Plus Jakarta Sans -->
+      <!-- Brand Logo con soporte de tema (Piazzolla Serif) -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center shadow-lg shadow-white/10 font-serif font-black text-xl tracking-tight">
+        <div class="brand-logo-box w-10 h-10 rounded-xl flex items-center justify-center font-serif font-black text-xl tracking-tight">
           DV
         </div>
         <div>
@@ -87,7 +87,7 @@
             <h1 class="font-serif text-2xl font-extrabold tracking-tight text-white leading-none">
               DETAILVLAK
             </h1>
-            <span class="text-[9px] font-display font-extrabold tracking-widest px-1.5 py-0.5 rounded bg-white text-black uppercase">
+            <span class="brand-badge text-[9px] font-display font-extrabold tracking-widest px-1.5 py-0.5 rounded uppercase">
               STUDIO
             </span>
           </div>
@@ -95,17 +95,17 @@
         </div>
       </div>
 
-      <!-- Operator Switcher (Maximiliano / Romina) en Blanco y Negro -->
+      <!-- Operator Switcher (Maximiliano / Romina) con conmutación dinámica de tema -->
       <div class="flex items-center bg-mono-900/90 p-1 rounded-xl border border-mono-800 shadow-inner">
         <span class="text-[10px] font-display font-bold uppercase tracking-widest text-mono-400 px-2.5 hidden sm:inline flex items-center gap-1.5">
           <i data-lucide="user-check" class="w-3.5 h-3.5 text-white"></i> Atendido por:
         </span>
-        <button id="btn-user-maxi" onclick="setActiveUser('Maximiliano')" class="user-btn px-3 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
+        <button id="btn-user-maxi" onclick="setActiveUser('Maximiliano')" class="user-btn px-3.5 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
           Maximiliano
         </button>
-        <button id="btn-user-romi" onclick="setActiveUser('Romina')" class="user-btn px-3 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+        <button id="btn-user-romi" onclick="setActiveUser('Romina')" class="user-btn px-3.5 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ff2d78]"></span>
           Romina
         </button>
       </div>
@@ -133,7 +133,7 @@
   <!-- MAIN WRAPPER -->
   <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-    <!-- KPI STATS CARDS EN MONOCROMO ESTILO CARVLAK -->
+    <!-- KPI STATS CARDS -->
     <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
       
       <!-- Total Leads -->
@@ -171,7 +171,7 @@
 
       <!-- Turnos Confirmados -->
       <div class="bg-mono-900 border border-mono-800 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-white text-black flex items-center justify-center shrink-0 shadow-md">
+        <div class="w-11 h-11 rounded-xl brand-logo-box flex items-center justify-center shrink-0 shadow-md">
           <i data-lucide="calendar-check" class="w-5 h-5"></i>
         </div>
         <div>
@@ -208,7 +208,7 @@
         <button onclick="openSheetGuideModal()" class="text-xs font-display font-bold text-white underline py-1 px-2">
           ¿Cómo autorizar la hoja?
         </button>
-        <button onclick="loadSampleData()" class="text-xs font-display font-bold bg-white hover:bg-mono-200 text-black rounded-lg px-3.5 py-1.5 transition">
+        <button onclick="loadSampleData()" class="btn-action-primary text-xs font-display font-bold rounded-lg px-3.5 py-1.5 transition">
           Cargar Ejemplos
         </button>
       </div>
@@ -255,7 +255,7 @@
         </div>
         <h3 class="font-serif text-lg font-bold text-white mb-1">No se encontraron solicitudes</h3>
         <p class="font-sans text-xs text-mono-400 max-w-sm mx-auto mb-4">Ajustá la búsqueda o sincronizá para recibir las últimas respuestas del Google Form.</p>
-        <button onclick="syncGoogleSheets()" class="px-5 py-2.5 bg-white hover:bg-mono-200 text-black rounded-xl text-xs font-display font-bold transition inline-flex items-center gap-2 shadow-md">
+        <button onclick="syncGoogleSheets()" class="btn-action-primary px-5 py-2.5 rounded-xl text-xs font-display font-bold transition inline-flex items-center gap-2 shadow-md">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sincronizar Ahora
         </button>
       </div>
@@ -270,7 +270,7 @@
       <!-- Modal Header -->
       <div class="bg-black px-6 py-4 border-b border-mono-800 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
-          <div class="w-10 h-10 rounded-2xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center font-serif font-bold text-lg">
+          <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center font-serif font-bold text-lg">
             <i data-lucide="calculator" class="w-5 h-5"></i>
           </div>
           <div>
@@ -369,14 +369,14 @@
         </div>
 
         <!-- TOTAL DESTACADO ESTILO CARVLAK -->
-        <div class="bg-black border border-white/20 rounded-2xl p-5 flex items-center justify-between shadow-lg">
+        <div class="highlight-box bg-black border border-white/20 rounded-2xl p-5 flex items-center justify-between shadow-lg transition-all">
           <div>
             <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-mono-400">TOTAL TASACIÓN DETAILVLAK</div>
             <div class="text-xs font-mono text-mono-400 mt-0.5" id="modal-calc-breakdown">Subtotal: $0</div>
           </div>
           <div class="text-right">
             <div class="font-serif text-3xl sm:text-4xl font-black text-white leading-tight" id="modal-total-display">$0 <span class="font-sans text-xs text-mono-400 font-medium">UYU</span></div>
-            <span class="text-[9px] font-display font-extrabold uppercase tracking-widest text-black bg-white px-2.5 py-0.5 rounded-full inline-block mt-1">Cotización Lista</span>
+            <span class="brand-badge text-[9px] font-display font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full inline-block mt-1">Cotización Lista</span>
           </div>
         </div>
 
@@ -429,8 +429,8 @@
             Guardar
           </button>
 
-          <!-- BOTÓN PRINCIPAL WHATSAPP (Blanco y Negro de alto contraste) -->
-          <button onclick="sendViaWhatsApp()" class="flex-1 sm:flex-initial px-5 py-2.5 bg-white hover:bg-mono-200 active:scale-95 text-black rounded-xl text-xs font-display font-extrabold shadow-lg shadow-white/10 flex items-center justify-center gap-2 transition">
+          <!-- BOTÓN PRINCIPAL WHATSAPP (Dinámico con el tema del operador) -->
+          <button onclick="sendViaWhatsApp()" class="btn-action-primary flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-2 transition active:scale-95">
             <i data-lucide="send" class="w-4 h-4"></i>
             <span>Enviar por WhatsApp</span>
           </button>
@@ -446,7 +446,7 @@
       
       <div class="bg-black px-6 py-4 border-b border-mono-800 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
-          <div class="w-10 h-10 rounded-2xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center font-serif">
+          <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center font-serif">
             <i data-lucide="sliders" class="w-5 h-5"></i>
           </div>
           <div>
@@ -489,7 +489,7 @@
           </button>
           <div class="flex gap-2.5">
             <button onclick="closeModalTarifario()" class="px-4 py-2 bg-mono-800 hover:bg-mono-700 text-mono-200 rounded-xl font-display font-bold">Cancelar</button>
-            <button onclick="saveTarifario()" class="px-5 py-2 bg-white hover:bg-mono-200 text-black rounded-xl font-display font-extrabold transition">Guardar Precios</button>
+            <button onclick="saveTarifario()" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold transition">Guardar Precios</button>
           </div>
         </div>
       </div>
@@ -503,7 +503,7 @@
       
       <div class="bg-black px-6 py-4 border-b border-mono-800 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
-          <div class="w-10 h-10 rounded-2xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center font-serif">
+          <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center font-serif">
             <i data-lucide="settings" class="w-5 h-5"></i>
           </div>
           <div>
@@ -556,7 +556,7 @@
           </button>
           <div class="flex gap-2.5">
             <button onclick="closeModalSettings()" class="px-4 py-2 bg-mono-800 text-mono-200 rounded-xl font-display font-bold">Cerrar</button>
-            <button onclick="saveSettings()" class="px-5 py-2 bg-white hover:bg-mono-200 text-black rounded-xl font-display font-extrabold transition">Guardar</button>
+            <button onclick="saveSettings()" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold transition">Guardar</button>
           </div>
         </div>
 

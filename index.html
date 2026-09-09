@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DETAILVLAK | Sistema de Tasación & Gestión Automotriz</title>
   
-  <!-- Favicon e íconos iOS PWA -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23000000'/><text x='50%' y='55%' dominant-baseline='central' text-anchor='middle' font-size='50'>🚗</text></svg>">
+  <!-- Favicon e íconos iOS PWA con el logo oficial -->
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="DetailVlak">
@@ -77,21 +78,23 @@
   <header class="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-mono-800/80 px-4 py-3.5">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
-      <!-- Brand Logo con soporte de tema (Piazzolla Serif) -->
-      <div class="flex items-center gap-3">
-        <div class="brand-logo-box w-10 h-10 rounded-xl flex items-center justify-center font-serif font-black text-xl tracking-tight">
-          DV
-        </div>
-        <div>
+      <!-- Brand Logo Oficial Detail VLAK -->
+      <div class="flex items-center gap-3.5">
+        <img 
+          src="logo.jpg" 
+          alt="Detail VLAK" 
+          class="h-10 sm:h-12 w-auto object-contain rounded-xl border border-mono-800 shadow-md transition-transform hover:scale-105"
+        />
+        <div class="hidden sm:block border-l border-mono-800 pl-3">
           <div class="flex items-center gap-2">
-            <h1 class="font-serif text-2xl font-extrabold tracking-tight text-white leading-none">
-              DETAILVLAK
-            </h1>
+            <span class="font-serif text-lg font-extrabold tracking-tight text-white leading-none">
+              DETAIL VLAK
+            </span>
             <span class="brand-badge text-[9px] font-display font-extrabold tracking-widest px-1.5 py-0.5 rounded uppercase">
               STUDIO
             </span>
           </div>
-          <p class="text-[11px] font-sans text-mono-400 tracking-wide mt-0.5">Tasación Inteligente • WhatsApp CRM</p>
+          <p class="text-[10px] font-sans text-mono-400 tracking-wide mt-0.5">Estética Automotriz • Tasación & CRM</p>
         </div>
       </div>
 

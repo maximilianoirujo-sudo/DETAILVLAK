@@ -1,5 +1,6 @@
 /**
  * DetailVlak - Sistema de Tasación Automática & Gestión de Turnos
+ * Estética Monocromática Oficial CarVlak (Instrument Sans + Piazzolla + Plus Jakarta Sans)
  * Diseñado para Maximiliano & Romina
  */
 
@@ -258,7 +259,6 @@ async function syncGoogleSheets(isSilent = false) {
   ];
 
   let csvText = null;
-  let fetchError = null;
 
   for (const url of csvUrls) {
     try {
@@ -268,21 +268,19 @@ async function syncGoogleSheets(isSilent = false) {
         break;
       }
     } catch (err) {
-      fetchError = err;
+      // Intentar el siguiente endpoint
     }
   }
 
   if (icon) icon.classList.remove("animate-spin");
 
   if (csvText && csvText.trim().length > 0) {
-    // Éxito: parsear CSV
     parseGoogleSheetsCSV(csvText);
     if (noticeBanner) noticeBanner.classList.add("hidden");
     if (!isSilent) showToast("¡Respuestas de Google Forms sincronizadas!");
     renderLeads();
     updateStats();
   } else {
-    // Si la hoja es privada o hay restricción de CORS
     if (noticeBanner && statusText) {
       noticeBanner.classList.remove("hidden");
       statusText.innerHTML = `La hoja de Google Sheets está en modo <strong>Restringido</strong>. Para sincronizar en vivo con un clic, configurala como <em>"Cualquier persona con el vínculo puede ser Lector"</em>.`;
@@ -293,14 +291,12 @@ async function syncGoogleSheets(isSilent = false) {
   }
 }
 
-// Parseador de CSV de Google Forms
 function parseGoogleSheetsCSV(csvText) {
   const rows = parseCSVToArray(csvText);
   if (rows.length < 2) return;
 
   const headers = rows[0].map(h => (h || "").trim().toLowerCase());
 
-  // Mapeo inteligente de encabezados
   const colTimestamp = headers.findIndex(h => h.includes("marca") || h.includes("fecha") || h.includes("time"));
   const colName = headers.findIndex(h => h.includes("nombre"));
   const colPhone = headers.findIndex(h => h.includes("whatsapp") || h.includes("tel") || h.includes("cel"));
@@ -323,9 +319,7 @@ function parseGoogleSheetsCSV(csvText) {
     const vehicle = (colVehicle !== -1 ? row[colVehicle] : "Vehículo no especificado").trim();
     const timestamp = (colTimestamp !== -1 ? row[colTimestamp] : new Date().toISOString()).trim();
 
-    // Generar ID determinista basado en nombre, tel y fecha
     const leadId = "lead-" + btoa(encodeURIComponent(name + phone + timestamp)).replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
-
     const existingLead = appState.leads.find(l => l.id === leadId);
 
     const rawCategory = colCategory !== -1 ? (row[colCategory] || "") : "";
@@ -370,7 +364,6 @@ function parseGoogleSheetsCSV(csvText) {
   }
 }
 
-// Helper para parsear CSV respetando comillas
 function parseCSVToArray(text) {
   const result = [];
   let row = [];
@@ -412,7 +405,7 @@ function normalizeCarCategory(str) {
   if (s.includes("pick") || s.includes("camioneta") || s.includes("hilux") || s.includes("amarok") || s.includes("ranger")) return "pickup";
   if (s.includes("suv") || s.includes("rural") || s.includes("tracker") || s.includes("compass") || s.includes("duster")) return "suv";
   if (s.includes("sedán mediano") || s.includes("sedan") || s.includes("vento") || s.includes("corolla") || s.includes("cruze") || s.includes("focus")) return "mediano";
-  return "chico"; // Default: Hatchback / Chico
+  return "chico";
 }
 
 function getCategoryLabel(catKey) {
@@ -451,17 +444,9 @@ function renderLeads() {
   if (!container) return;
 
   const filtered = appState.leads.filter(lead => {
-    // Filtro por Estado
-    if (appState.activeFilter !== "ALL" && lead.status !== appState.activeFilter) {
-      return false;
-    }
+    if (appState.activeFilter !== "ALL" && lead.status !== appState.activeFilter) return false;
+    if (appState.activeOpFilter !== "ALL" && lead.assignedTo !== appState.activeOpFilter) return false;
 
-    // Filtro por Operador
-    if (appState.activeOpFilter !== "ALL" && lead.assignedTo !== appState.activeOpFilter) {
-      return false;
-    }
-
-    // Buscador
     if (searchInput) {
       const matchName = lead.name.toLowerCase().includes(searchInput);
       const matchVehicle = lead.vehicle.toLowerCase().includes(searchInput);
@@ -487,40 +472,40 @@ function renderLeads() {
     const categoryBadge = getCategoryBadge(lead.category);
 
     return `
-      <div class="lead-card bg-[#111927] border ${isNew ? 'border-amber-500/40 shadow-md shadow-amber-500/5' : 'border-slate-800'} rounded-2xl p-4 flex flex-col justify-between gap-3">
+      <div class="lead-card bg-mono-900 border ${isNew ? 'border-white/40 shadow-lg shadow-white/5' : 'border-mono-800'} rounded-2xl p-4 flex flex-col justify-between gap-3">
         
         <!-- Header Tarjeta -->
         <div>
-          <div class="flex items-start justify-between gap-2 mb-1.5">
+          <div class="flex items-start justify-between gap-2 mb-2">
             <div>
-              <h3 class="font-bold text-white text-sm flex items-center gap-1.5">
+              <h3 class="font-display font-bold text-white text-sm flex items-center gap-2">
                 ${lead.name}
-                ${isNew ? '<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>' : ''}
+                ${isNew ? '<span class="w-2 h-2 rounded-full bg-white animate-ping"></span>' : ''}
               </h3>
-              <p class="text-[11px] text-slate-400 font-mono">${formatPhoneForDisplay(lead.phone)}</p>
+              <p class="text-[11px] font-mono text-mono-400 mt-0.5">${formatPhoneForDisplay(lead.phone)}</p>
             </div>
             ${statusBadge}
           </div>
 
           <!-- Info Vehículo -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 my-2">
-            <div class="flex items-center justify-between gap-1 text-xs">
-              <span class="font-bold text-cyan-300 truncate">${lead.vehicle}</span>
+          <div class="bg-black border border-mono-800 rounded-xl p-3 my-2">
+            <div class="flex items-center justify-between gap-2 text-xs">
+              <span class="font-serif font-bold text-white truncate text-sm">${lead.vehicle}</span>
               ${categoryBadge}
             </div>
             ${lead.customerNotes ? `
-              <p class="text-[11px] text-slate-400 italic line-clamp-2 mt-1 border-t border-slate-800/60 pt-1">
+              <p class="text-[11px] font-sans text-mono-400 italic line-clamp-2 mt-1.5 border-t border-mono-800/80 pt-1.5">
                 "${lead.customerNotes}"
               </p>
             ` : ''}
           </div>
 
           <!-- Chips de Servicios Solicitados -->
-          <div class="space-y-1">
-            <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Servicios solicitados:</span>
+          <div class="space-y-1 mt-2">
+            <span class="text-[9px] font-display uppercase font-extrabold text-mono-400 tracking-wider">Servicios solicitados:</span>
             <div class="flex flex-wrap gap-1">
               ${lead.requestedServices.map(s => `
-                <span class="px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[10px] text-slate-300">
+                <span class="px-2 py-0.5 rounded-md bg-mono-800/90 border border-mono-700 text-[10px] font-sans text-mono-200">
                   ${cleanServiceName(s)}
                 </span>
               `).join('')}
@@ -529,18 +514,18 @@ function renderLeads() {
         </div>
 
         <!-- Footer Tarjeta -->
-        <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+        <div class="pt-3 border-t border-mono-800 flex items-center justify-between gap-2">
           
-          <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
-            <span class="w-2 h-2 rounded-full ${lead.assignedTo === 'Maximiliano' ? 'bg-cyan-400' : 'bg-pink-400'}"></span>
-            <span class="font-semibold text-slate-300">${lead.assignedTo || 'Sin asignar'}</span>
-            ${lead.quotedTotal > 0 ? `<span class="font-bold text-emerald-400 ml-1">$${lead.quotedTotal.toLocaleString('es-UY')}</span>` : ''}
+          <div class="flex items-center gap-2 text-[11px] font-display">
+            <span class="w-2 h-2 rounded-full bg-white"></span>
+            <span class="font-bold text-mono-300">${lead.assignedTo || 'Sin asignar'}</span>
+            ${lead.quotedTotal > 0 ? `<span class="font-serif font-black text-white ml-1 text-sm">$${lead.quotedTotal.toLocaleString('es-UY')}</span>` : ''}
           </div>
 
           <!-- Botón de Acción -->
-          <button onclick="openModalCotizador('${lead.id}')" class="px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md shadow-cyan-600/20 flex items-center gap-1.5 transition">
+          <button onclick="openModalCotizador('${lead.id}')" class="px-3.5 py-1.5 bg-white hover:bg-mono-200 active:scale-95 text-black font-display font-extrabold text-xs rounded-xl shadow-md shadow-white/5 flex items-center gap-1.5 transition">
             <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
-            <span>${lead.quotedTotal > 0 ? 'Editar Cotización' : 'Cotizar'}</span>
+            <span>${lead.quotedTotal > 0 ? 'Ver Cotización' : 'Cotizar'}</span>
           </button>
 
         </div>
@@ -559,23 +544,23 @@ function cleanServiceName(name) {
 function getStatusBadge(status) {
   switch (status) {
     case "NUEVO":
-      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">🟡 Por Cotizar</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-white/10 text-white border border-white/30">Por Cotizar</span>`;
     case "COTIZADO":
-      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">🟣 Cotizado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-800 text-mono-200 border border-mono-700">Cotizado</span>`;
     case "TURNO":
-      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">🟢 Turno Agendado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-white text-black font-black">Turno Agendado</span>`;
     case "FINALIZADO":
-      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">✅ Finalizado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-800 text-mono-400 border border-mono-700">Finalizado</span>`;
     case "CANCELADO":
-      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-700/40 text-slate-400 border border-slate-700">⚪ Cancelado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-950 text-mono-500 border border-mono-800">Cancelado</span>`;
     default:
-      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400">${status}</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-bold uppercase bg-mono-800 text-mono-400">${status}</span>`;
   }
 }
 
 function getCategoryBadge(cat) {
   const label = getCategoryLabel(cat);
-  return `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${label}</span>`;
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-display font-bold uppercase tracking-wider bg-mono-800 text-white border border-mono-700">${label}</span>`;
 }
 
 function updateStats() {
@@ -599,7 +584,6 @@ function openModalCotizador(leadId) {
 
   appState.currentLead = lead;
 
-  // Llenar datos de cabecera
   document.getElementById("modal-lead-name").innerText = lead.name;
   document.getElementById("modal-lead-phone").innerText = formatPhoneForDisplay(lead.phone);
   document.getElementById("modal-lead-car-subtitle").innerText = `${lead.vehicle}`;
@@ -616,17 +600,12 @@ function openModalCotizador(leadId) {
     notesBox.classList.add("hidden");
   }
 
-  // Enlace directo de llamada
   const cleanPhone = sanitizePhoneForWhatsApp(lead.phone);
   document.getElementById("modal-lead-call-btn").href = `tel:${cleanPhone}`;
 
-  // Cargar checklist de servicios
   renderModalServices();
-
-  // Recalcular presupuesto y previsualizar mensaje
   recalculateQuote();
 
-  // Abrir Modal
   const modal = document.getElementById("modal-cotizador");
   modal.classList.remove("hidden");
   lucide.createIcons();
@@ -642,8 +621,6 @@ function renderModalServices() {
   const container = document.getElementById("modal-services-list");
   const category = document.getElementById("modal-car-category").value || "chico";
 
-  // Determinar qué servicios marcar:
-  // Si ya tiene quotedServices guardado, usar esos. Si no, mapear desde requestedServices del Google Form.
   let selectedIds = lead.quotedServices && lead.quotedServices.length > 0
     ? lead.quotedServices
     : detectServicesFromLead(lead);
@@ -653,14 +630,14 @@ function renderModalServices() {
     const isChecked = selectedIds.includes(tariff.id);
 
     return `
-      <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-850 cursor-pointer transition">
-        <input type="checkbox" value="${tariff.id}" onchange="recalculateQuote()" ${isChecked ? 'checked' : ''} class="mt-0.5 w-4 h-4 rounded text-cyan-500 focus:ring-0">
+      <label class="flex items-start gap-3 p-3 rounded-xl border border-mono-800 bg-black hover:border-mono-600 cursor-pointer transition">
+        <input type="checkbox" value="${tariff.id}" onchange="recalculateQuote()" ${isChecked ? 'checked' : ''} class="mt-0.5 w-4 h-4 rounded text-white focus:ring-0">
         <div class="flex-1">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-white text-xs">${tariff.shortName}</span>
-            <span class="font-black text-cyan-400 text-xs">$${price.toLocaleString('es-UY')}</span>
+            <span class="font-display font-bold text-white text-xs">${tariff.shortName}</span>
+            <span class="font-serif font-black text-white text-xs">$${price.toLocaleString('es-UY')}</span>
           </div>
-          <p class="text-[10px] text-slate-400 line-clamp-1">${tariff.description}</p>
+          <p class="font-sans text-[10px] text-mono-400 line-clamp-1 mt-0.5">${tariff.description}</p>
         </div>
       </label>
     `;
@@ -687,7 +664,7 @@ function detectServicesFromLead(lead) {
     }
   });
 
-  return matched.length > 0 ? matched : ["interior"]; // fallback
+  return matched.length > 0 ? matched : ["interior"];
 }
 
 function recalculateQuote() {
@@ -706,7 +683,6 @@ function recalculateQuote() {
     }
   });
 
-  // Descuentos
   const discountType = document.getElementById("modal-discount-type").value;
   const customDiscountInput = document.getElementById("modal-discount-custom");
   let discountAmount = 0;
@@ -724,12 +700,9 @@ function recalculateQuote() {
     customDiscountInput.classList.add("hidden");
   }
 
-  // Recargo
   const surcharge = parseFloat(document.getElementById("modal-surcharge").value) || 0;
-
   const total = Math.max(0, subtotal - discountAmount + surcharge);
 
-  // Estimación de tiempo
   const timeInput = document.getElementById("modal-time-estimate");
   if (!timeInput.value || timeInput.dataset.autocalc !== "false") {
     let calculatedTime = "";
@@ -741,12 +714,10 @@ function recalculateQuote() {
     timeInput.value = calculatedTime;
   }
 
-  // UI display
   document.getElementById("modal-calc-breakdown").innerText =
     `Subtotal: $${subtotal.toLocaleString('es-UY')} ${discountAmount > 0 ? `(-$${discountAmount.toLocaleString('es-UY')})` : ''} ${surcharge > 0 ? `(+$${surcharge.toLocaleString('es-UY')})` : ''}`;
-  document.getElementById("modal-total-display").innerHTML = `$${total.toLocaleString('es-UY')} <span class="text-xs text-cyan-400 font-normal">UYU</span>`;
+  document.getElementById("modal-total-display").innerHTML = `$${total.toLocaleString('es-UY')} <span class="font-sans text-xs text-mono-400 font-medium">UYU</span>`;
 
-  // Actualizar lead temporal
   if (appState.currentLead) {
     appState.currentLead.quotedServices = selectedServiceIds;
     appState.currentLead.quotedTotal = total;
@@ -782,7 +753,6 @@ function updatePreviewMessage() {
   const checkedBoxes = Array.from(document.querySelectorAll("#modal-services-list input[type='checkbox']:checked"));
   const selectedServiceIds = checkedBoxes.map(cb => cb.value);
 
-  // Lista detallada con precios
   const itemsDetail = selectedServiceIds.map(id => {
     const tariff = appState.tariffs.find(t => t.id === id);
     if (!tariff) return "";
@@ -790,7 +760,6 @@ function updatePreviewMessage() {
     return `• *${tariff.shortName}:* $${price.toLocaleString('es-UY')} UYU`;
   }).filter(Boolean).join("\n");
 
-  // Lista resumida
   const itemsSummary = selectedServiceIds.map(id => {
     const tariff = appState.tariffs.find(t => t.id === id);
     return tariff ? tariff.shortName : "";
@@ -893,11 +862,9 @@ function sendViaWhatsApp() {
   const messageText = document.getElementById("modal-whatsapp-preview").value;
   const encodedText = encodeURIComponent(messageText);
 
-  // Marcar automáticamente como cotizado
   const newStatus = document.getElementById("modal-lead-status").value;
   saveLeadQuoteOnly(newStatus === "NUEVO" ? "COTIZADO" : newStatus);
 
-  // Abrir WhatsApp Web / App
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
   window.open(whatsappUrl, "_blank");
 
@@ -919,19 +886,16 @@ function saveLeadQuoteOnly(overrideStatus) {
   showToast("Cambios guardados correctamente");
 }
 
-// Limpiador inteligente de teléfono para Uruguay y el mundo
 function sanitizePhoneForWhatsApp(phoneRaw) {
   if (!phoneRaw) return "";
   let digits = phoneRaw.replace(/\D/g, "");
 
-  // Si es un celular de Uruguay que arranca con 09X (ej: 099123456)
   if (digits.startsWith("09") && digits.length === 9) {
-    digits = "598" + digits.substring(1); // 59899123456
+    digits = "598" + digits.substring(1);
   } else if (digits.startsWith("9") && digits.length === 8) {
-    digits = "598" + digits; // 59899123456
+    digits = "598" + digits;
   }
 
-  // Si no tiene código de país, asegurar Uruguay por defecto
   if (digits.length === 8 || digits.length === 9) {
     if (!digits.startsWith("598")) digits = "598" + digits;
   }
@@ -949,25 +913,25 @@ function openTarifarioModal() {
   const tbody = document.getElementById("tarifario-table-body");
   tbody.innerHTML = appState.tariffs.map(tariff => {
     return `
-      <tr class="hover:bg-slate-900/50">
-        <td class="py-2.5 px-3">
-          <div class="font-bold text-white text-xs">${tariff.shortName}</div>
-          <div class="text-[10px] text-slate-400">${tariff.description}</div>
+      <tr class="hover:bg-mono-800/40">
+        <td class="py-3 px-3.5">
+          <div class="font-display font-bold text-white text-xs">${tariff.shortName}</div>
+          <div class="font-sans text-[10px] text-mono-400 mt-0.5">${tariff.description}</div>
         </td>
-        <td class="py-2 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="chico" value="${tariff.prices.chico}" class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center text-cyan-300">
+        <td class="py-2.5 px-1 text-center">
+          <input type="number" data-id="${tariff.id}" data-cat="chico" value="${tariff.prices.chico}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
         </td>
-        <td class="py-2 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="mediano" value="${tariff.prices.mediano}" class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center text-cyan-300">
+        <td class="py-2.5 px-1 text-center">
+          <input type="number" data-id="${tariff.id}" data-cat="mediano" value="${tariff.prices.mediano}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
         </td>
-        <td class="py-2 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="suv" value="${tariff.prices.suv}" class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center text-cyan-300">
+        <td class="py-2.5 px-1 text-center">
+          <input type="number" data-id="${tariff.id}" data-cat="suv" value="${tariff.prices.suv}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
         </td>
-        <td class="py-2 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="pickup" value="${tariff.prices.pickup}" class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center text-cyan-300">
+        <td class="py-2.5 px-1 text-center">
+          <input type="number" data-id="${tariff.id}" data-cat="pickup" value="${tariff.prices.pickup}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
         </td>
-        <td class="py-2 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="moto" value="${tariff.prices.moto}" class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center text-cyan-300">
+        <td class="py-2.5 px-1 text-center">
+          <input type="number" data-id="${tariff.id}" data-cat="moto" value="${tariff.prices.moto}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
         </td>
       </tr>
     `;
@@ -1044,7 +1008,6 @@ function loadSampleData() {
   showToast("5 consultas de prueba cargadas");
 }
 
-// Toast Notificaciones
 function showToast(message, type = "success") {
   const toast = document.getElementById("toast");
   const toastMsg = document.getElementById("toast-message");

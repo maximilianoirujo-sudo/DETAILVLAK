@@ -1,108 +1,123 @@
-/* DetailVlak Automotive Studio Custom Styles */
+/* DetailVlak - Monochrome CarVlak Aesthetic Styles */
 
 :root {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Piazzolla', Georgia, serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Space Mono', monospace;
 }
 
 body {
   font-family: var(--font-sans);
+  background-color: #000000;
+  color: #e4e4e7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
-/* Custom Scrollbar */
+h1, h2, h3, .font-heading {
+  font-family: var(--font-serif);
+}
+
+/* Custom Scrollbar - Monochrome */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #080c14;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #27272a;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #52525b;
 }
 
-/* Active Operator button styles */
+/* Operadores (Maxi / Romi) - Pure Black & White */
 .user-btn {
-  color: #94a3b8;
+  color: #a1a1aa;
 }
 .user-btn.active {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(59, 130, 246, 0.2));
-  color: #ffffff;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  box-shadow: 0 0 15px rgba(2, 132, 199, 0.2);
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+}
+.user-btn.active span {
+  background-color: #000000;
 }
 
 /* Filter pills */
 .filter-pill {
-  background: #0f172a;
-  color: #94a3b8;
-  border: 1px solid #1e293b;
+  background: #09090b;
+  color: #a1a1aa;
+  border: 1px solid #27272a;
   transition: all 0.15s ease;
 }
 .filter-pill:hover {
-  background: #1e293b;
+  background: #18181b;
   color: #ffffff;
+  border-color: #3f3f46;
 }
 .filter-pill.active {
-  background: #0284c7;
-  color: #ffffff;
-  border-color: #38bdf8;
-  box-shadow: 0 0 10px rgba(2, 132, 199, 0.3);
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
 /* Operator pills */
 .op-pill {
-  color: #94a3b8;
+  color: #71717a;
   transition: all 0.15s ease;
 }
 .op-pill:hover {
   color: #ffffff;
 }
 .op-pill.active {
-  background: #1e293b;
-  color: #38bdf8;
+  background: #27272a;
+  color: #ffffff;
   font-weight: 700;
 }
 
 /* Template tabs */
 .template-tab {
-  background: #0b1120;
-  color: #94a3b8;
-  border: 1px solid #1e293b;
+  background: #000000;
+  color: #a1a1aa;
+  border: 1px solid #27272a;
   transition: all 0.15s ease;
 }
 .template-tab:hover {
-  background: #1e293b;
-  color: #f1f5f9;
+  background: #18181b;
+  color: #ffffff;
 }
 .template-tab.active {
-  background: #059669;
-  color: #ffffff;
-  border-color: #34d399;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
 }
 
-/* Lead Card Glow and Animations */
+/* Lead Cards */
 .lead-card {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 .lead-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.3);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px -3px rgba(14, 165, 233, 0.15);
+  transform: translateY(-3px);
+  border-color: #52525b;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.05);
 }
 
-/* Modal Smooth Entrance */
+/* Animations */
 @keyframes modalSlideUp {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(10px);
+    transform: scale(0.97) translateY(12px);
   }
   to {
     opacity: 1;
@@ -114,12 +129,12 @@ body {
   animation: modalSlideUp 0.2s ease-out forwards;
 }
 
-/* Checkbox and inputs styling */
+/* Checkbox and radio in monochrome */
 input[type="checkbox"] {
-  accent-color: #06b6d4;
+  accent-color: #ffffff;
 }
 
-/* Safe touch area on iPhone */
+/* Safe touch area for mobile iPhone */
 @supports (-webkit-touch-callout: none) {
   button, select, input {
     min-height: 38px;

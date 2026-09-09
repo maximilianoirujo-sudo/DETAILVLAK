@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DetailVlak | Sistema de Tasación & Gestión</title>
+  
+  <!-- Favicon e íconos iOS PWA -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><text x='50%' y='55%' dominant-baseline='central' text-anchor='middle' font-size='50'>🚗</text></svg>">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DetailVlak">
+  <meta name="theme-color" content="#090d16">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Tailwind CSS CDN & Fuentes -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              primary: '#00d2ff',
+              accent: '#3a7bd5',
+              dark: '#080c14',
+              surface: '#0f172a',
+              card: '#131d33',
+              border: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#080c14] text-slate-100 min-h-screen font-sans antialiased pb-20 md:pb-8 selection:bg-cyan-500 selection:text-black">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-30 bg-[#0c1220]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-black text-xl tracking-tighter">
+          DV
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+              DetailVlak
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Studio</span>
+            </h1>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Shangrilá, Canelones • Tasación & WhatsApp</p>
+        </div>
+      </div>
+
+      <!-- Operator Switcher (Maximiliano / Romina) -->
+      <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-700/60 shadow-inner">
+        <span class="text-[11px] font-medium text-slate-400 px-2 hidden sm:inline flex items-center gap-1">
+          <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-400"></i> Operador:
+        </span>
+        <button id="btn-user-maxi" onclick="setActiveUser('Maximiliano')" class="user-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50"></span>
+          Maximiliano
+        </button>
+        <button id="btn-user-romi" onclick="setActiveUser('Romina')" class="user-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-pink-400 shadow-sm shadow-pink-400/50"></span>
+          Romina
+        </button>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar Google Sheets" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+          <i data-lucide="refresh-cw" id="icon-sync" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span class="hidden md:inline">Sincronizar</span>
+        </button>
+
+        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+          <i data-lucide="calculator" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="hidden md:inline">Tarifario</span>
+        </button>
+
+        <button onclick="openSettingsModal()" title="Ajustes y Conexión" class="p-2 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 rounded-xl text-xs transition">
+          <i data-lucide="settings" class="w-4 h-4 text-slate-300"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
+
+    <!-- KPI STATS CARDS -->
+    <section class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <!-- Total Leads -->
+      <div class="bg-[#111927] border border-slate-800/80 rounded-2xl p-3.5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
+          <i data-lucide="inbox" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 font-medium">Total Solicitudes</div>
+          <div id="stat-total" class="text-xl font-black text-white">0</div>
+        </div>
+      </div>
+
+      <!-- Nuevos / Por Cotizar -->
+      <div class="bg-[#111927] border border-slate-800/80 rounded-2xl p-3.5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
+          <i data-lucide="clock" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 font-medium">Por Cotizar</div>
+          <div id="stat-nuevos" class="text-xl font-black text-amber-400">0</div>
+        </div>
+      </div>
+
+      <!-- Presupuestados -->
+      <div class="bg-[#111927] border border-slate-800/80 rounded-2xl p-3.5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center shrink-0">
+          <i data-lucide="send" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 font-medium">Cotizados</div>
+          <div id="stat-cotizados" class="text-xl font-black text-purple-400">0</div>
+        </div>
+      </div>
+
+      <!-- Turnos Confirmados -->
+      <div class="bg-[#111927] border border-slate-800/80 rounded-2xl p-3.5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
+          <i data-lucide="calendar-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 font-medium">Turnos Agendados</div>
+          <div id="stat-turnos" class="text-xl font-black text-emerald-400">0</div>
+        </div>
+      </div>
+
+      <!-- Facturación Estimada -->
+      <div class="col-span-2 md:col-span-1 bg-[#111927] border border-slate-800/80 rounded-2xl p-3.5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center shrink-0">
+          <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 font-medium">Cotizado Total ($UYU)</div>
+          <div id="stat-monto" class="text-lg font-black text-cyan-400">$0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATUS ALERT / SHEET CONNECTION BANNER -->
+    <div id="sheet-notice-banner" class="hidden bg-gradient-to-r from-cyan-950/40 to-blue-950/40 border border-cyan-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+          <i data-lucide="info" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-sm font-bold text-white">Conexión con Google Sheets de DetailVlak</div>
+          <div class="text-xs text-slate-300" id="sheet-status-text">Cargando respuestas de la hoja de cálculo...</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 self-end sm:self-auto">
+        <button onclick="openSheetGuideModal()" class="text-xs font-semibold text-cyan-300 hover:text-cyan-200 underline py-1 px-2">
+          ¿Cómo autorizar la hoja?
+        </button>
+        <button onclick="loadSampleData()" class="text-xs font-semibold bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/30 rounded-lg px-3 py-1.5 transition">
+          Cargar Ejemplos
+        </button>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH CONTROLS -->
+    <section class="bg-[#101726] border border-slate-800/90 rounded-2xl p-3.5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="search-input" oninput="renderLeads()" placeholder="Buscar por cliente, auto, teléfono o servicio..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
+      </div>
+
+      <!-- Filter by Status -->
+      <div class="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+        <button onclick="setStatusFilter('ALL')" data-filter="ALL" class="filter-pill active px-3 py-1.5 rounded-lg text-xs font-semibold">Todos</button>
+        <button onclick="setStatusFilter('NUEVO')" data-filter="NUEVO" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-400">🟡 Nuevos</button>
+        <button onclick="setStatusFilter('COTIZADO')" data-filter="COTIZADO" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-400">🟣 Cotizados</button>
+        <button onclick="setStatusFilter('TURNO')" data-filter="TURNO" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400">🟢 Turnos</button>
+        <button onclick="setStatusFilter('FINALIZADO')" data-filter="FINALIZADO" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-400">✅ Finalizados</button>
+      </div>
+
+      <!-- Filter by Operator -->
+      <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 shrink-0">
+        <span class="text-[10px] text-slate-500 font-semibold px-1.5 uppercase">Ver:</span>
+        <button onclick="setOperatorFilter('ALL')" data-op-filter="ALL" class="op-pill active px-2.5 py-1 text-xs font-medium rounded-lg">Todos</button>
+        <button onclick="setOperatorFilter('Maximiliano')" data-op-filter="Maximiliano" class="op-pill px-2.5 py-1 text-xs font-medium rounded-lg">Maxi</button>
+        <button onclick="setOperatorFilter('Romina')" data-op-filter="Romina" class="op-pill px-2.5 py-1 text-xs font-medium rounded-lg">Romi</button>
+      </div>
+
+    </section>
+
+    <!-- LEADS CARDS CONTAINER -->
+    <section>
+      <div id="leads-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Dynamic Cards Rendered by JS -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-16 bg-[#101726]/40 border border-slate-800/80 rounded-2xl">
+        <div class="w-14 h-14 rounded-2xl bg-slate-800/60 text-slate-400 flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="car" class="w-7 h-7 text-cyan-400"></i>
+        </div>
+        <h3 class="text-base font-bold text-white mb-1">No hay consultas con estos filtros</h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto mb-4">Ajustá la búsqueda o sincronizá para recibir las últimas respuestas de tu Google Form.</p>
+        <button onclick="syncGoogleSheets()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition inline-flex items-center gap-2">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sincronizar Ahora
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL DE COTIZACIÓN & WHATSAPP ==================== -->
+  <div id="modal-cotizador" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-[#0f172a] border border-slate-700/80 rounded-3xl w-full max-w-3xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in">
+      
+      <!-- Modal Header -->
+      <div class="bg-[#141e33] px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center font-bold text-lg">
+            <i data-lucide="calculator" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              Tasación & Propuesta para <span id="modal-lead-name" class="text-cyan-400">Cliente</span>
+            </h2>
+            <p id="modal-lead-car-subtitle" class="text-xs text-slate-400 font-medium">Vehículo • Tamaño</p>
+          </div>
+        </div>
+        <button onclick="closeModalCotizador()" class="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-5 overflow-y-auto space-y-5 text-xs text-slate-300">
+        
+        <!-- Cliente & Vehículo Info Banner -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Teléfono / WhatsApp</span>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="modal-lead-phone" class="font-bold text-white text-sm">--</span>
+              <a id="modal-lead-call-btn" href="#" target="_blank" class="text-emerald-400 hover:text-emerald-300 p-1" title="Llamar o abrir directo">
+                <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Categoría de Auto</span>
+            <select id="modal-car-category" onchange="recalculateQuote()" class="mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-cyan-300 font-semibold w-full">
+              <option value="chico">Hatchback / Chico</option>
+              <option value="mediano">Sedán Mediano / Grande</option>
+              <option value="suv">SUV / Rural</option>
+              <option value="pickup">Pick-up / Camioneta Grande</option>
+              <option value="moto">Moto</option>
+            </select>
+          </div>
+
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Atendido Por</span>
+            <select id="modal-assigned-operator" onchange="updateOperatorForLead()" class="mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-semibold w-full">
+              <option value="Maximiliano">Maximiliano</option>
+              <option value="Romina">Romina</option>
+            </select>
+          </div>
+
+          <!-- Observaciones / Comentarios del cliente -->
+          <div id="modal-lead-notes-box" class="sm:col-span-3 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 text-[11px] text-slate-400">
+            <span class="text-slate-500 font-bold">Comentario del cliente en el Form: </span>
+            <span id="modal-lead-notes" class="italic text-slate-300 font-normal">Sin notas adicionales</span>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 1: CALCULADORA DE DETALLADO -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <i data-lucide="check-square" class="w-4 h-4 text-cyan-400"></i>
+              Servicios a Cotizar
+            </h3>
+            <span class="text-[11px] text-slate-500">Tildá o destildá para sumar al presupuesto</span>
+          </div>
+
+          <!-- Checkboxes de Servicios con Precios Dinámicos -->
+          <div id="modal-services-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Renderizado dinámico de servicios -->
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: AJUSTES (DESCUENTOS / RECARGOS / TIEMPO) -->
+        <div class="bg-slate-900/60 border border-slate-800/90 rounded-2xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400 block mb-1">Descuento / Combo</label>
+            <div class="flex items-center gap-2">
+              <select id="modal-discount-type" onchange="recalculateQuote()" class="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200">
+                <option value="none">Sin Desc.</option>
+                <option value="10">10% Off</option>
+                <option value="15">15% Off</option>
+                <option value="custom">Monto Fijo $</option>
+              </select>
+              <input type="number" id="modal-discount-custom" oninput="recalculateQuote()" placeholder="$0" class="hidden w-24 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400 block mb-1">Recargo (Suciedad extrema/detalles)</label>
+            <input type="number" id="modal-surcharge" oninput="recalculateQuote()" placeholder="$0" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white">
+          </div>
+
+          <div>
+            <label class="text-[11px] font-semibold text-slate-400 block mb-1">Tiempo Estimado</label>
+            <input type="text" id="modal-time-estimate" oninput="updatePreviewMessage()" placeholder="Ej: 4 a 6 horas / 1 día" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white">
+          </div>
+        </div>
+
+        <!-- TOTAL DESTACADO -->
+        <div class="bg-gradient-to-r from-cyan-950/60 to-blue-950/60 border border-cyan-500/40 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-semibold text-cyan-300">TOTAL TASACIÓN DETAILVLAK</div>
+            <div class="text-[11px] text-slate-400" id="modal-calc-breakdown">Subtotal: $0</div>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl sm:text-3xl font-black text-white" id="modal-total-display">$0 <span class="text-xs text-cyan-400 font-normal">UYU</span></div>
+            <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Cotización Lista</span>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: PLANTILLAS DE WHATSAPP -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <i data-lucide="message-square" class="w-4 h-4 text-emerald-400"></i>
+              Mensaje Automático para WhatsApp
+            </h3>
+            <span class="text-[11px] text-slate-500">Elegí la plantilla y editala si querés</span>
+          </div>
+
+          <!-- Selector de Plantilla Tabs -->
+          <div class="flex flex-wrap gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <button onclick="setMsgTemplate('formal')" data-template-btn="formal" class="template-tab active px-2.5 py-1 text-xs font-semibold rounded-lg">✨ Formal Detallada</button>
+            <button onclick="setMsgTemplate('promo')" data-template-btn="promo" class="template-tab px-2.5 py-1 text-xs font-semibold rounded-lg">🎁 Promo Combo</button>
+            <button onclick="setMsgTemplate('fotos')" data-template-btn="fotos" class="template-tab px-2.5 py-1 text-xs font-semibold rounded-lg">📸 Pedir Fotos</button>
+            <button onclick="setMsgTemplate('seguimiento')" data-template-btn="seguimiento" class="template-tab px-2.5 py-1 text-xs font-semibold rounded-lg">⏳ Seguimiento</button>
+            <button onclick="setMsgTemplate('turno')" data-template-btn="turno" class="template-tab px-2.5 py-1 text-xs font-semibold rounded-lg">🗓️ Confirmar Turno</button>
+          </div>
+
+          <!-- Cuadro de Texto Previsualizable y Editable -->
+          <div class="relative">
+            <textarea id="modal-whatsapp-preview" rows="7" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-3 text-xs font-mono text-emerald-300 focus:outline-none focus:border-emerald-500 leading-relaxed"></textarea>
+            <button onclick="copyWhatsAppMessage()" class="absolute right-3 top-3 p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 border border-slate-700 transition" title="Copiar texto">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="copy-btn-text">Copiar</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-[#141e33] px-5 py-3.5 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <span class="text-xs text-slate-400 font-medium">Marcar como:</span>
+          <select id="modal-lead-status" class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none">
+            <option value="NUEVO">🟡 Nuevo</option>
+            <option value="COTIZADO" selected>🟣 Presupuesto Enviado</option>
+            <option value="TURNO">🟢 Turno Confirmado</option>
+            <option value="FINALIZADO">✅ Trabajo Completado</option>
+            <option value="CANCELADO">⚪ Cancelado / Sin Rta</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button onclick="saveLeadQuoteOnly()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+            Guardar Cambios
+          </button>
+
+          <!-- BOTÓN PRINCIPAL WHATSAPP -->
+          <button onclick="sendViaWhatsApp()" class="flex-1 sm:flex-initial px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Enviar por WhatsApp</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE TARIFARIO (CONFIGURABLE) ==================== -->
+  <div id="modal-tarifario" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-[#0f172a] border border-slate-700/80 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+      
+      <div class="bg-[#141e33] px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center">
+            <i data-lucide="sliders" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">Tarifario de Precios Base ($ UYU)</h2>
+            <p class="text-xs text-slate-400">Modificá los precios de DetailVlak según el tamaño del vehículo</p>
+          </div>
+        </div>
+        <button onclick="closeModalTarifario()" class="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/60">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        <p class="text-slate-400 text-xs">
+          Estos valores se usan como base para calcular automáticamente los presupuestos cuando los clientes llenan el Google Form. Podés ajustarlos en cualquier momento.
+        </p>
+
+        <!-- Tabla Responsive de Tarifas -->
+        <div class="overflow-x-auto border border-slate-800 rounded-2xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-900/90 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
+                <th class="py-2.5 px-3">Servicio de Detailing</th>
+                <th class="py-2.5 px-2 text-center">Chico</th>
+                <th class="py-2.5 px-2 text-center">Mediano</th>
+                <th class="py-2.5 px-2 text-center">SUV / Rural</th>
+                <th class="py-2.5 px-2 text-center">Pick-up / Grande</th>
+                <th class="py-2.5 px-2 text-center">Moto</th>
+              </tr>
+            </thead>
+            <tbody id="tarifario-table-body" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Renderizado por JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="resetDefaultTarifario()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold underline">
+            Restablecer valores originales
+          </button>
+          <div class="flex gap-2">
+            <button onclick="closeModalTarifario()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold">Cancelar</button>
+            <button onclick="saveTarifario()" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold transition">Guardar Precios</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE CONFIGURACIÓN & GUÍA ==================== -->
+  <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-[#0f172a] border border-slate-700/80 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+      
+      <div class="bg-[#141e33] px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">Configuración del Negocio</h2>
+            <p class="text-xs text-slate-400">Datos de DetailVlak y vinculación de base de datos</p>
+          </div>
+        </div>
+        <button onclick="closeModalSettings()" class="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/60">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        
+        <div>
+          <label class="block text-slate-300 font-bold mb-1">Enlace de la Hoja de Cálculo de Google Forms</label>
+          <input type="text" id="setting-sheet-url" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono" placeholder="https://docs.google.com/spreadsheets/d/...">
+          <p class="text-[11px] text-slate-500 mt-1">La hoja vinculada a las respuestas del formulario.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Nombre del Taller</label>
+            <input type="text" id="setting-shop-name" value="DetailVlak" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+          </div>
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Ubicación / Dirección</label>
+            <input type="text" id="setting-shop-address" value="Av. Giannattasio y, 15000 Shangrilá, Canelones" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+          </div>
+        </div>
+
+        <!-- Guía de conexión rápida -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-2">
+          <div class="font-bold text-white flex items-center gap-1.5 text-xs">
+            <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
+            ¿Cómo autorizar la hoja para sincronización automática?
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-slate-400 text-[11px] leading-relaxed">
+            <li>Abrí tu Google Sheet en el navegador.</li>
+            <li>Tocá el botón verde <strong class="text-white">"Compartir"</strong> arriba a la derecha.</li>
+            <li>En <strong class="text-white">"Acceso general"</strong>, cambiá de <em>Restringido</em> a <strong class="text-emerald-400">"Cualquier persona que tenga el vínculo"</strong> (rol: <em>Lector</em>).</li>
+            <li>¡Listo! Con eso la app podrá leer en tiempo real todas las respuestas sin pedir contraseñas.</li>
+          </ol>
+        </div>
+
+        <!-- Importar manualmente CSV o datos de prueba -->
+        <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+          <button onclick="loadSampleData()" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold">
+            Cargar 5 solicitudes de prueba
+          </button>
+          <div class="flex gap-2">
+            <button onclick="closeModalSettings()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold">Cerrar</button>
+            <button onclick="saveSettings()" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold transition">Guardar</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white border border-slate-700 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-message">Operación exitosa</span>
+  </div>
+
+  <!-- MAIN APP SCRIPT -->
+  <script src="app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

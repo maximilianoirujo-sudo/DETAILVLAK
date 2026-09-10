@@ -98,12 +98,17 @@
 
       <!-- Quick Action Buttons -->
       <div class="flex items-center gap-2">
-        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar Google Sheets" class="px-3.5 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
+        <button onclick="openNewManualQuote()" id="btn-nueva-tasacion" title="Tasar vehículo presencial en taller" class="btn-action-primary px-3.5 py-2 rounded-xl text-xs font-display font-extrabold flex items-center gap-1.5 transition shadow-sm active:scale-95">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>+ Nueva Tasación</span>
+        </button>
+
+        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar Google Sheets" class="px-3 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
           <i data-lucide="refresh-cw" id="icon-sync" class="w-3.5 h-3.5 text-slate-700"></i>
           <span class="hidden md:inline">Sincronizar</span>
         </button>
 
-        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-3.5 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
+        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-3 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
           <i data-lucide="calculator" class="w-3.5 h-3.5 text-slate-700"></i>
           <span class="hidden md:inline">Tarifario</span>
         </button>
@@ -261,7 +266,7 @@
           </div>
           <div>
             <h2 class="font-serif text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              Tasación Oficial • <span id="modal-lead-name" class="text-slate-900 underline">Cliente</span>
+              <span id="modal-title-action">Tasación</span> • <span id="modal-lead-name-display" class="text-slate-900 underline">Cliente</span>
             </h2>
             <p id="modal-lead-car-subtitle" class="font-display text-xs text-slate-500 tracking-wide font-medium">Vehículo • Tamaño</p>
           </div>
@@ -274,41 +279,61 @@
       <!-- Modal Body (Scrollable) -->
       <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-700 bg-white">
         
-        <!-- Cliente & Vehículo Info Banner -->
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <!-- Cliente & Vehículo Info Banner (Campos Editables para Tasación en Taller o Form) -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5 shadow-sm">
           <div>
-            <span class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block">Teléfono / WhatsApp</span>
-            <div class="flex items-center gap-2 mt-1">
-              <span id="modal-lead-phone" class="font-mono font-bold text-slate-900 text-sm">--</span>
-              <a id="modal-lead-call-btn" href="#" target="_blank" class="text-slate-700 hover:text-slate-900 p-1" title="Llamar o abrir directo">
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Nombre del Cliente</label>
+            <input type="text" id="modal-lead-name-input" oninput="onLeadDataInput()" placeholder="Ej: Juan Pérez" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 focus:outline-none focus:border-slate-800">
+          </div>
+
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Teléfono / WhatsApp</label>
+            <div class="flex items-center gap-1.5">
+              <input type="text" id="modal-lead-phone-input" oninput="onLeadDataInput()" placeholder="Ej: 099 123 456" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-800">
+              <a id="modal-lead-call-btn" href="#" target="_blank" class="p-1.5 bg-white border border-slate-300 rounded-lg text-slate-700 hover:text-slate-900 shrink-0 shadow-sm" title="Llamar o abrir directo">
                 <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
               </a>
             </div>
           </div>
 
           <div>
-            <span class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block">Categoría de Vehículo</span>
-            <select id="modal-car-category" onchange="recalculateQuote()" class="mt-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 w-full focus:outline-none focus:border-slate-700">
-              <option value="chico">Hatchback / Sedán Chico</option>
-              <option value="mediano">Sedán Mediano / Grande</option>
-              <option value="suv">SUV / Monovolumen / Rural</option>
-              <option value="pickup">Pick-up / Camioneta Grande</option>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Vehículo (Marca, Modelo, Año)</label>
+            <input type="text" id="modal-lead-vehicle-input" oninput="onLeadDataInput()" placeholder="Ej: Volkswagen Golf 2020 Gris" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-serif font-bold text-slate-900 focus:outline-none focus:border-slate-800">
+          </div>
+
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Categoría de Vehículo</label>
+            <select id="modal-car-category" onchange="recalculateQuote()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 w-full focus:outline-none focus:border-slate-700">
+              <option value="chico">Hatchback / Sedán Chico (Gol, 208, Sandero)</option>
+              <option value="mediano">Sedán Mediano / Grande (Vento, Corolla)</option>
+              <option value="suv">SUV / Monovolumen / Rural (Tracker, Kicks)</option>
+              <option value="pickup">Pick-up / Camioneta Grande (Hilux, Amarok)</option>
               <option value="moto">Moto</option>
             </select>
           </div>
 
           <div>
-            <span class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block">Atendido Por</span>
-            <select id="modal-assigned-operator" onchange="updateOperatorForLead()" class="mt-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 w-full focus:outline-none focus:border-slate-700">
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Atendido Por</label>
+            <select id="modal-assigned-operator" onchange="updateOperatorForLead()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 w-full focus:outline-none focus:border-slate-700">
               <option value="Maximiliano">Maximiliano</option>
               <option value="Romina">Romina</option>
             </select>
           </div>
 
-          <!-- Observaciones del cliente -->
-          <div id="modal-lead-notes-box" class="sm:col-span-3 bg-white p-3 rounded-xl border border-slate-200 text-[11px] font-sans text-slate-600">
-            <span class="text-slate-900 font-display font-bold uppercase tracking-wider text-[10px]">Detalles del cliente: </span>
-            <span id="modal-lead-notes" class="italic text-slate-800 font-normal">Sin notas adicionales</span>
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Origen de la Solicitud</label>
+            <select id="modal-lead-source" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-sans text-slate-800 w-full focus:outline-none">
+              <option value="Presencial / Taller">🏬 Presencial en Taller (Mostrador)</option>
+              <option value="WhatsApp Directo">💬 WhatsApp Directo</option>
+              <option value="Llamada Telefónica">📞 Llamada Telefónica</option>
+              <option value="Google Form">📋 Google Form</option>
+            </select>
+          </div>
+
+          <!-- Observaciones del cliente / estado del auto -->
+          <div class="sm:col-span-3">
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Detalles / Estado del auto o Zonas a Priorizar</label>
+            <input type="text" id="modal-lead-notes-input" oninput="onLeadDataInput()" placeholder="Ej: Mancha de café en asiento trasero, ópticas opacas, pintura con marcas de lavado..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-800">
           </div>
         </div>
 

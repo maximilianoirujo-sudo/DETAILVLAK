@@ -486,9 +486,14 @@ function renderLeads() {
         <div>
           <div class="flex items-start justify-between gap-2 mb-2">
             <div>
-              <h3 class="font-display font-bold text-slate-900 text-sm flex items-center gap-2">
-                ${lead.name}
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="text-[9px] font-display font-bold uppercase tracking-wider px-1.5 py-0.2 rounded ${lead.source && lead.source.includes('Presencial') ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
+                  ${lead.source && lead.source.includes('Presencial') ? '🏬 Taller' : '📋 Form'}
+                </span>
                 ${isNew ? '<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>' : ''}
+              </div>
+              <h3 class="font-display font-bold text-slate-900 text-sm">
+                ${lead.name}
               </h3>
               <p class="text-[11px] font-mono text-slate-500 mt-0.5">${formatPhoneForDisplay(lead.phone)}</p>
             </div>
@@ -586,30 +591,81 @@ function updateStats() {
 }
 
 // ================= MODAL DE COTIZACIÓN & MOTOR DE TASACIÓN =================
+function openNewManualQuote() {
+  const newLead = {
+    id: "manual-" + Date.now(),
+    timestamp: new Date().toLocaleString("es-UY"),
+    name: "",
+    phone: "",
+    vehicle: "",
+    color: "",
+    category: "chico",
+    requestedServices: ["Limpieza profunda de interiores (Tapizados, alfombras, techo, paneles y desinfección)"],
+    customerNotes: "",
+    preferredDate: "A coordinar",
+    source: "Presencial / Taller",
+    status: "COTIZADO",
+    assignedTo: appState.config.activeUser,
+    quotedServices: ["interior"],
+    quotedTotal: 0,
+    discountAmount: 0,
+    timeEstimate: "",
+    internalNotes: ""
+  };
+
+  appState.currentLead = newLead;
+  appState.isCreatingNewManual = true;
+
+  document.getElementById("modal-title-action").innerText = "Nueva Tasación Presencial";
+  document.getElementById("modal-lead-name-display").innerText = "Nuevo Cliente";
+  document.getElementById("modal-lead-car-subtitle").innerText = "Completá los datos del vehículo para calcular";
+
+  document.getElementById("modal-lead-name-input").value = "";
+  document.getElementById("modal-lead-phone-input").value = "";
+  document.getElementById("modal-lead-vehicle-input").value = "";
+  document.getElementById("modal-lead-notes-input").value = "";
+  document.getElementById("modal-car-category").value = "chico";
+  document.getElementById("modal-assigned-operator").value = appState.config.activeUser;
+  document.getElementById("modal-lead-source").value = "Presencial / Taller";
+  document.getElementById("modal-lead-status").value = "COTIZADO";
+
+  document.getElementById("modal-lead-call-btn").href = "#";
+
+  renderModalServices();
+  recalculateQuote();
+
+  const modal = document.getElementById("modal-cotizador");
+  modal.classList.remove("hidden");
+  lucide.createIcons();
+
+  setTimeout(() => {
+    const input = document.getElementById("modal-lead-name-input");
+    if (input) input.focus();
+  }, 100);
+}
+
 function openModalCotizador(leadId) {
   const lead = appState.leads.find(l => l.id === leadId);
   if (!lead) return;
 
   appState.currentLead = lead;
+  appState.isCreatingNewManual = false;
 
-  document.getElementById("modal-lead-name").innerText = lead.name;
-  document.getElementById("modal-lead-phone").innerText = formatPhoneForDisplay(lead.phone);
-  document.getElementById("modal-lead-car-subtitle").innerText = `${lead.vehicle}`;
+  document.getElementById("modal-title-action").innerText = "Tasación Oficial";
+  document.getElementById("modal-lead-name-display").innerText = lead.name || "Cliente";
+  document.getElementById("modal-lead-car-subtitle").innerText = `${lead.vehicle || "Vehículo"}`;
+
+  document.getElementById("modal-lead-name-input").value = lead.name || "";
+  document.getElementById("modal-lead-phone-input").value = lead.phone || "";
+  document.getElementById("modal-lead-vehicle-input").value = lead.vehicle || "";
+  document.getElementById("modal-lead-notes-input").value = lead.customerNotes || "";
   document.getElementById("modal-car-category").value = lead.category || "chico";
   document.getElementById("modal-assigned-operator").value = lead.assignedTo || appState.config.activeUser;
+  document.getElementById("modal-lead-source").value = lead.source || "Google Form";
   document.getElementById("modal-lead-status").value = lead.status;
 
-  const notesBox = document.getElementById("modal-lead-notes-box");
-  const notesText = document.getElementById("modal-lead-notes");
-  if (lead.customerNotes && lead.customerNotes.trim() !== "") {
-    notesBox.classList.remove("hidden");
-    notesText.innerText = `"${lead.customerNotes}"`;
-  } else {
-    notesBox.classList.add("hidden");
-  }
-
   const cleanPhone = sanitizePhoneForWhatsApp(lead.phone);
-  document.getElementById("modal-lead-call-btn").href = `tel:${cleanPhone}`;
+  document.getElementById("modal-lead-call-btn").href = cleanPhone ? `tel:${cleanPhone}` : "#";
 
   renderModalServices();
   recalculateQuote();
@@ -619,9 +675,32 @@ function openModalCotizador(leadId) {
   lucide.createIcons();
 }
 
+function onLeadDataInput() {
+  if (!appState.currentLead) return;
+
+  const nameVal = document.getElementById("modal-lead-name-input").value.trim();
+  const phoneVal = document.getElementById("modal-lead-phone-input").value.trim();
+  const vehicleVal = document.getElementById("modal-lead-vehicle-input").value.trim();
+  const notesVal = document.getElementById("modal-lead-notes-input").value.trim();
+
+  appState.currentLead.name = nameVal || (appState.isCreatingNewManual ? "Cliente en Taller" : "Cliente");
+  appState.currentLead.phone = phoneVal;
+  appState.currentLead.vehicle = vehicleVal || "Vehículo a tasar";
+  appState.currentLead.customerNotes = notesVal;
+
+  document.getElementById("modal-lead-name-display").innerText = appState.currentLead.name;
+  document.getElementById("modal-lead-car-subtitle").innerText = appState.currentLead.vehicle;
+
+  const cleanPhone = sanitizePhoneForWhatsApp(phoneVal);
+  document.getElementById("modal-lead-call-btn").href = cleanPhone ? `tel:${cleanPhone}` : "#";
+
+  updatePreviewMessage();
+}
+
 function closeModalCotizador() {
   document.getElementById("modal-cotizador").classList.add("hidden");
   appState.currentLead = null;
+  appState.isCreatingNewManual = false;
 }
 
 function renderModalServices() {
@@ -884,14 +963,32 @@ function saveLeadQuoteOnly(overrideStatus) {
   const lead = appState.currentLead;
   if (!lead) return;
 
+  const nameVal = document.getElementById("modal-lead-name-input").value.trim();
+  const phoneVal = document.getElementById("modal-lead-phone-input").value.trim();
+  const vehicleVal = document.getElementById("modal-lead-vehicle-input").value.trim();
+  const notesVal = document.getElementById("modal-lead-notes-input").value.trim();
+  const sourceVal = document.getElementById("modal-lead-source").value;
+
+  lead.name = nameVal || (appState.isCreatingNewManual ? "Cliente en Taller" : "Cliente");
+  lead.phone = phoneVal;
+  lead.vehicle = vehicleVal || "Vehículo en Taller";
+  lead.customerNotes = notesVal;
+  lead.source = sourceVal;
+  lead.category = document.getElementById("modal-car-category").value;
   lead.status = overrideStatus || document.getElementById("modal-lead-status").value;
   lead.assignedTo = document.getElementById("modal-assigned-operator").value;
   lead.timeEstimate = document.getElementById("modal-time-estimate").value;
 
+  // Si es una tasación manual creada desde el botón, agregarla al tablero
+  if (appState.isCreatingNewManual) {
+    appState.leads.unshift(lead);
+    appState.isCreatingNewManual = false;
+  }
+
   saveLeads();
   renderLeads();
   updateStats();
-  showToast("Cambios guardados correctamente");
+  showToast("Tasación guardada en el tablero");
 }
 
 function sanitizePhoneForWhatsApp(phoneRaw) {

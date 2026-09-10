@@ -480,29 +480,29 @@ function renderLeads() {
     const categoryBadge = getCategoryBadge(lead.category);
 
     return `
-      <div class="lead-card bg-mono-900 border ${isNew ? 'border-white/40 shadow-lg shadow-white/5' : 'border-mono-800'} rounded-2xl p-4 flex flex-col justify-between gap-3">
+      <div class="lead-card rounded-2xl p-4 flex flex-col justify-between gap-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all">
         
         <!-- Header Tarjeta -->
         <div>
           <div class="flex items-start justify-between gap-2 mb-2">
             <div>
-              <h3 class="font-display font-bold text-white text-sm flex items-center gap-2">
+              <h3 class="font-display font-bold text-slate-900 text-sm flex items-center gap-2">
                 ${lead.name}
-                ${isNew ? '<span class="w-2 h-2 rounded-full bg-white animate-ping"></span>' : ''}
+                ${isNew ? '<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>' : ''}
               </h3>
-              <p class="text-[11px] font-mono text-mono-400 mt-0.5">${formatPhoneForDisplay(lead.phone)}</p>
+              <p class="text-[11px] font-mono text-slate-500 mt-0.5">${formatPhoneForDisplay(lead.phone)}</p>
             </div>
             ${statusBadge}
           </div>
 
           <!-- Info Vehículo -->
-          <div class="bg-black border border-mono-800 rounded-xl p-3 my-2">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 my-2">
             <div class="flex items-center justify-between gap-2 text-xs">
-              <span class="font-serif font-bold text-white truncate text-sm">${lead.vehicle}</span>
+              <span class="font-serif font-bold text-slate-900 truncate text-sm">${lead.vehicle}</span>
               ${categoryBadge}
             </div>
             ${lead.customerNotes ? `
-              <p class="text-[11px] font-sans text-mono-400 italic line-clamp-2 mt-1.5 border-t border-mono-800/80 pt-1.5">
+              <p class="text-[11px] font-sans text-slate-600 italic line-clamp-2 mt-1.5 border-t border-slate-200 pt-1.5">
                 "${lead.customerNotes}"
               </p>
             ` : ''}
@@ -510,10 +510,10 @@ function renderLeads() {
 
           <!-- Chips de Servicios Solicitados -->
           <div class="space-y-1 mt-2">
-            <span class="text-[9px] font-display uppercase font-extrabold text-mono-400 tracking-wider">Servicios solicitados:</span>
+            <span class="text-[9px] font-display uppercase font-extrabold text-slate-400 tracking-wider">Servicios solicitados:</span>
             <div class="flex flex-wrap gap-1">
               ${lead.requestedServices.map(s => `
-                <span class="px-2 py-0.5 rounded-md bg-mono-800/90 border border-mono-700 text-[10px] font-sans text-mono-200">
+                <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-sans text-slate-800 font-medium">
                   ${cleanServiceName(s)}
                 </span>
               `).join('')}
@@ -522,12 +522,12 @@ function renderLeads() {
         </div>
 
         <!-- Footer Tarjeta -->
-        <div class="pt-3 border-t border-mono-800 flex items-center justify-between gap-2">
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
           
           <div class="flex items-center gap-2 text-[11px] font-display">
-            <span class="w-2 h-2 rounded-full ${lead.assignedTo === 'Romina' ? 'bg-[#ff2d78]' : 'bg-white'}"></span>
-            <span class="font-bold text-mono-300">${lead.assignedTo || 'Sin asignar'}</span>
-            ${lead.quotedTotal > 0 ? `<span class="font-serif font-black text-white ml-1 text-sm">$${lead.quotedTotal.toLocaleString('es-UY')}</span>` : ''}
+            <span class="w-2 h-2 rounded-full ${lead.assignedTo === 'Romina' ? 'bg-[#E11D48]' : 'bg-slate-900'}"></span>
+            <span class="font-bold text-slate-700">${lead.assignedTo || 'Sin asignar'}</span>
+            ${lead.quotedTotal > 0 ? `<span class="font-serif font-black text-slate-900 ml-1 text-sm">$${lead.quotedTotal.toLocaleString('es-UY')}</span>` : ''}
           </div>
 
           <!-- Botón de Acción dinámico -->
@@ -552,23 +552,23 @@ function cleanServiceName(name) {
 function getStatusBadge(status) {
   switch (status) {
     case "NUEVO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-white/10 text-white border border-white/30">Por Cotizar</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-amber-50 text-amber-800 border border-amber-200">Por Cotizar</span>`;
     case "COTIZADO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-800 text-mono-200 border border-mono-700">Cotizado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-purple-50 text-purple-800 border border-purple-200">Cotizado</span>`;
     case "TURNO":
-      return `<span class="brand-badge px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest font-black">Turno Agendado</span>`;
+      return `<span class="brand-badge px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest font-black shadow-sm">Turno Agendado</span>`;
     case "FINALIZADO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-800 text-mono-400 border border-mono-700">Finalizado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-slate-100 text-slate-700 border border-slate-200">Finalizado</span>`;
     case "CANCELADO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-mono-950 text-mono-500 border border-mono-800">Cancelado</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-slate-100 text-slate-400 border border-slate-200">Cancelado</span>`;
     default:
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-bold uppercase bg-mono-800 text-mono-400">${status}</span>`;
+      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-bold uppercase bg-slate-100 text-slate-700">${status}</span>`;
   }
 }
 
 function getCategoryBadge(cat) {
   const label = getCategoryLabel(cat);
-  return `<span class="px-2 py-0.5 rounded text-[10px] font-display font-bold uppercase tracking-wider bg-mono-800 text-white border border-mono-700">${label}</span>`;
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-display font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">${label}</span>`;
 }
 
 function updateStats() {
@@ -638,14 +638,14 @@ function renderModalServices() {
     const isChecked = selectedIds.includes(tariff.id);
 
     return `
-      <label class="flex items-start gap-3 p-3 rounded-xl border border-mono-800 bg-black hover:border-mono-600 cursor-pointer transition">
-        <input type="checkbox" value="${tariff.id}" onchange="recalculateQuote()" ${isChecked ? 'checked' : ''} class="mt-0.5 w-4 h-4 rounded text-white focus:ring-0">
+      <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 cursor-pointer transition">
+        <input type="checkbox" value="${tariff.id}" onchange="recalculateQuote()" ${isChecked ? 'checked' : ''} class="mt-0.5 w-4 h-4 rounded focus:ring-0">
         <div class="flex-1">
           <div class="flex items-center justify-between">
-            <span class="font-display font-bold text-white text-xs">${tariff.shortName}</span>
-            <span class="font-serif font-black text-white text-xs">$${price.toLocaleString('es-UY')}</span>
+            <span class="font-display font-bold text-slate-900 text-xs">${tariff.shortName}</span>
+            <span class="font-serif font-black text-slate-900 text-xs">$${price.toLocaleString('es-UY')}</span>
           </div>
-          <p class="font-sans text-[10px] text-mono-400 line-clamp-1 mt-0.5">${tariff.description}</p>
+          <p class="font-sans text-[10px] text-slate-500 line-clamp-1 mt-0.5">${tariff.description}</p>
         </div>
       </label>
     `;
@@ -921,25 +921,25 @@ function openTarifarioModal() {
   const tbody = document.getElementById("tarifario-table-body");
   tbody.innerHTML = appState.tariffs.map(tariff => {
     return `
-      <tr class="hover:bg-mono-800/40">
-        <td class="py-3 px-3.5">
-          <div class="font-display font-bold text-white text-xs">${tariff.shortName}</div>
-          <div class="font-sans text-[10px] text-mono-400 mt-0.5">${tariff.description}</div>
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="py-3 px-3.5 border-b border-slate-200">
+          <div class="font-display font-bold text-slate-900 text-xs">${tariff.shortName}</div>
+          <div class="font-sans text-[10px] text-slate-500 mt-0.5">${tariff.description}</div>
         </td>
-        <td class="py-2.5 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="chico" value="${tariff.prices.chico}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
+        <td class="py-2.5 px-1 text-center border-b border-slate-200">
+          <input type="number" data-id="${tariff.id}" data-cat="chico" value="${tariff.prices.chico}" class="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-800">
         </td>
-        <td class="py-2.5 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="mediano" value="${tariff.prices.mediano}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
+        <td class="py-2.5 px-1 text-center border-b border-slate-200">
+          <input type="number" data-id="${tariff.id}" data-cat="mediano" value="${tariff.prices.mediano}" class="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-800">
         </td>
-        <td class="py-2.5 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="suv" value="${tariff.prices.suv}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
+        <td class="py-2.5 px-1 text-center border-b border-slate-200">
+          <input type="number" data-id="${tariff.id}" data-cat="suv" value="${tariff.prices.suv}" class="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-800">
         </td>
-        <td class="py-2.5 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="pickup" value="${tariff.prices.pickup}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
+        <td class="py-2.5 px-1 text-center border-b border-slate-200">
+          <input type="number" data-id="${tariff.id}" data-cat="pickup" value="${tariff.prices.pickup}" class="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-800">
         </td>
-        <td class="py-2.5 px-1 text-center">
-          <input type="number" data-id="${tariff.id}" data-cat="moto" value="${tariff.prices.moto}" class="w-20 bg-black border border-mono-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-white">
+        <td class="py-2.5 px-1 text-center border-b border-slate-200">
+          <input type="number" data-id="${tariff.id}" data-cat="moto" value="${tariff.prices.moto}" class="w-20 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-xs text-center font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-800">
         </td>
       </tr>
     `;

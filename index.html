@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="dark" data-operator="maxi">
+<html lang="es" data-operator="maxi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,9 +9,9 @@
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <link rel="apple-touch-icon" href="logo.jpg">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="DetailVlak">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#F8FAFC">
   <link rel="manifest" href="manifest.json">
 
   <!-- Google Fonts Oficiales de CarVlak: Instrument Sans + Piazzolla Serif + Plus Jakarta Sans + Space Mono -->
@@ -23,7 +23,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -31,22 +30,6 @@
             serif: ['"Piazzolla"', 'Georgia', 'serif'],
             display: ['"Plus Jakarta Sans"', 'sans-serif'],
             mono: ['"Space Mono"', 'monospace'],
-          },
-          colors: {
-            mono: {
-              950: '#000000',
-              900: '#09090b',
-              850: '#111113',
-              800: '#18181b',
-              700: '#27272a',
-              600: '#3f3f46',
-              500: '#71717a',
-              400: '#a1a1aa',
-              300: '#d4d4d8',
-              200: '#e4e4e7',
-              100: '#f4f4f5',
-              50: '#fafafa',
-            }
           }
         }
       }
@@ -57,76 +40,76 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-black text-mono-200 min-h-screen font-sans antialiased pb-20 md:pb-8 selection:bg-white selection:text-black">
+<body class="bg-[#F8FAFC] text-slate-900 min-h-screen font-sans antialiased pb-20 md:pb-8 selection:bg-black selection:text-white">
 
-  <!-- TOP ANNOUNCEMENT / STATUS BAR (Estilo CarVlak) -->
-  <div class="bg-mono-900 text-mono-400 px-4 py-2 text-[11px] font-display font-medium border-b border-mono-800 tracking-wide">
+  <!-- TOP ANNOUNCEMENT BAR (Estilo CarVlak Oficial #1E2B31) -->
+  <div class="bg-[#1E2B31] text-slate-200 px-4 py-2 text-[11px] font-display font-medium border-b border-slate-700 tracking-wide">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-4">
       <div class="flex items-center space-x-2">
-        <span class="inline-block w-2 h-2 rounded-full bg-white animate-pulse"></span>
-        <span class="font-bold text-white uppercase tracking-wider text-[10px]">Taller Activo:</span>
-        <span class="text-mono-300">Av. Giannattasio y, 15000 Shangrilá • Canelones, Uruguay</span>
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-bold text-white uppercase tracking-wider text-[10px]">Taller en Shangrilá:</span>
+        <span class="text-slate-300">Av. Giannattasio y, 15000 Shangrilá • Canelones, Uruguay</span>
       </div>
-      <div class="flex items-center space-x-4 text-mono-400">
-        <span class="hidden md:inline text-[10px] uppercase tracking-widest text-mono-400">Estética Automotriz & Detailing de Precisión</span>
+      <div class="flex items-center space-x-4 text-slate-300">
+        <span class="hidden md:inline text-[10px] uppercase tracking-widest">Estética Automotriz & Detailing de Precisión</span>
         <span class="text-white font-mono font-bold text-[11px]">CARVLAK GROUP</span>
       </div>
     </div>
   </div>
 
-  <!-- MAIN HEADER / NAVIGATION -->
-  <header class="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-mono-800/80 px-4 py-3.5">
+  <!-- MAIN HEADER / NAVIGATION (Blanco nítido de alto contraste) -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-4 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
       <!-- Brand Logo Oficial Detail VLAK -->
-      <div class="flex items-center gap-3.5">
+      <div class="flex items-center gap-3">
         <img 
           src="logo.jpg" 
           alt="Detail VLAK" 
-          class="h-10 sm:h-12 w-auto object-contain rounded-xl border border-mono-800 shadow-md transition-transform hover:scale-105"
+          class="h-11 sm:h-12 w-auto object-contain rounded-xl border border-slate-200 shadow-sm transition-transform hover:scale-105"
         />
-        <div class="hidden sm:block border-l border-mono-800 pl-3">
+        <div class="hidden sm:block border-l border-slate-200 pl-3">
           <div class="flex items-center gap-2">
-            <span class="font-serif text-lg font-extrabold tracking-tight text-white leading-none">
+            <span class="font-serif text-lg font-extrabold tracking-tight text-slate-900 leading-none">
               DETAIL VLAK
             </span>
             <span class="brand-badge text-[9px] font-display font-extrabold tracking-widest px-1.5 py-0.5 rounded uppercase">
               STUDIO
             </span>
           </div>
-          <p class="text-[10px] font-sans text-mono-400 tracking-wide mt-0.5">Estética Automotriz • Tasación & CRM</p>
+          <p class="text-[10px] font-sans text-slate-500 tracking-wide mt-0.5">Tasación Inteligente • WhatsApp CRM</p>
         </div>
       </div>
 
-      <!-- Operator Switcher (Maximiliano / Romina) con conmutación dinámica de tema -->
-      <div class="flex items-center bg-mono-900/90 p-1 rounded-xl border border-mono-800 shadow-inner">
-        <span class="text-[10px] font-display font-bold uppercase tracking-widest text-mono-400 px-2.5 hidden sm:inline flex items-center gap-1.5">
-          <i data-lucide="user-check" class="w-3.5 h-3.5 text-white"></i> Atendido por:
+      <!-- Operator Switcher (Maximiliano / Romina) -->
+      <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+        <span class="text-[10px] font-display font-bold uppercase tracking-widest text-slate-500 px-2.5 hidden sm:inline flex items-center gap-1.5">
+          <i data-lucide="user-check" class="w-3.5 h-3.5 text-slate-700"></i> Atendido por:
         </span>
         <button id="btn-user-maxi" onclick="setActiveUser('Maximiliano')" class="user-btn px-3.5 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-900"></span>
           Maximiliano
         </button>
         <button id="btn-user-romi" onclick="setActiveUser('Romina')" class="user-btn px-3.5 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#ff2d78]"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#E11D48]"></span>
           Romina
         </button>
       </div>
 
       <!-- Quick Action Buttons -->
       <div class="flex items-center gap-2">
-        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar Google Sheets" class="px-3.5 py-2 bg-mono-900 hover:bg-mono-800 active:scale-95 text-mono-100 border border-mono-700/80 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
-          <i data-lucide="refresh-cw" id="icon-sync" class="w-3.5 h-3.5 text-white"></i>
+        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar Google Sheets" class="px-3.5 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
+          <i data-lucide="refresh-cw" id="icon-sync" class="w-3.5 h-3.5 text-slate-700"></i>
           <span class="hidden md:inline">Sincronizar</span>
         </button>
 
-        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-3.5 py-2 bg-mono-900 hover:bg-mono-800 active:scale-95 text-mono-100 border border-mono-700/80 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
-          <i data-lucide="calculator" class="w-3.5 h-3.5 text-white"></i>
+        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-3.5 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
+          <i data-lucide="calculator" class="w-3.5 h-3.5 text-slate-700"></i>
           <span class="hidden md:inline">Tarifario</span>
         </button>
 
-        <button onclick="openSettingsModal()" title="Ajustes y Conexión" class="p-2 bg-mono-900 hover:bg-mono-800 active:scale-95 text-mono-200 border border-mono-700/80 rounded-xl text-xs transition shadow-sm">
-          <i data-lucide="settings" class="w-4 h-4 text-white"></i>
+        <button onclick="openSettingsModal()" title="Ajustes y Conexión" class="p-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 border border-slate-300 rounded-xl text-xs transition shadow-sm">
+          <i data-lucide="settings" class="w-4 h-4"></i>
         </button>
       </div>
 
@@ -136,79 +119,79 @@
   <!-- MAIN WRAPPER -->
   <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-    <!-- KPI STATS CARDS -->
+    <!-- KPI STATS CARDS (Tarjetas blancas de máxima legibilidad bajo el sol) -->
     <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
       
       <!-- Total Leads -->
-      <div class="bg-mono-900 border border-mono-800 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center shrink-0">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
           <i data-lucide="inbox" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-mono-400 font-bold">Solicitudes</div>
-          <div id="stat-total" class="font-serif text-2xl font-extrabold text-white leading-tight">0</div>
+          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Solicitudes</div>
+          <div id="stat-total" class="font-serif text-2xl font-extrabold text-slate-900 leading-tight">0</div>
         </div>
       </div>
 
       <!-- Por Cotizar -->
-      <div class="bg-mono-900 border border-mono-800 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center shrink-0">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center shrink-0">
           <i data-lucide="clock" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-mono-400 font-bold">Por Cotizar</div>
-          <div id="stat-nuevos" class="font-serif text-2xl font-extrabold text-white leading-tight">0</div>
+          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Por Cotizar</div>
+          <div id="stat-nuevos" class="font-serif text-2xl font-extrabold text-amber-700 leading-tight">0</div>
         </div>
       </div>
 
       <!-- Cotizados -->
-      <div class="bg-mono-900 border border-mono-800 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center shrink-0">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
           <i data-lucide="send" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-mono-400 font-bold">Cotizados</div>
-          <div id="stat-cotizados" class="font-serif text-2xl font-extrabold text-white leading-tight">0</div>
+          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Cotizados</div>
+          <div id="stat-cotizados" class="font-serif text-2xl font-extrabold text-slate-900 leading-tight">0</div>
         </div>
       </div>
 
       <!-- Turnos Confirmados -->
-      <div class="bg-mono-900 border border-mono-800 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl brand-logo-box flex items-center justify-center shrink-0 shadow-md">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0 shadow-sm">
           <i data-lucide="calendar-check" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-mono-400 font-bold">Turnos Agendados</div>
-          <div id="stat-turnos" class="font-serif text-2xl font-extrabold text-white leading-tight">0</div>
+          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Turnos Agendados</div>
+          <div id="stat-turnos" class="font-serif text-2xl font-extrabold text-emerald-700 leading-tight">0</div>
         </div>
       </div>
 
       <!-- Total Tasado ($ UYU) -->
-      <div class="col-span-2 md:col-span-1 bg-mono-900 border border-mono-800 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center shrink-0">
+      <div class="col-span-2 md:col-span-1 bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
           <i data-lucide="dollar-sign" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-mono-400 font-bold">Total Cotizado ($UYU)</div>
-          <div id="stat-monto" class="font-serif text-xl font-extrabold text-white leading-tight">$0</div>
+          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Total Cotizado ($UYU)</div>
+          <div id="stat-monto" class="font-serif text-xl font-extrabold text-slate-900 leading-tight">$0</div>
         </div>
       </div>
 
     </section>
 
     <!-- STATUS ALERT / SHEET CONNECTION BANNER -->
-    <div id="sheet-notice-banner" class="hidden bg-mono-900/80 border border-mono-700 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <div id="sheet-notice-banner" class="hidden bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-mono-800 text-white border border-mono-700 flex items-center justify-center shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
           <i data-lucide="info" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="text-sm font-display font-bold text-white">Conexión con Google Sheets de DetailVlak</div>
-          <div class="text-xs font-sans text-mono-400" id="sheet-status-text">Cargando respuestas de la hoja de cálculo...</div>
+          <div class="text-sm font-display font-bold text-slate-900">Conexión con Google Sheets de DetailVlak</div>
+          <div class="text-xs font-sans text-slate-600" id="sheet-status-text">Cargando respuestas de la hoja de cálculo...</div>
         </div>
       </div>
       <div class="flex items-center gap-2 self-end sm:self-auto">
-        <button onclick="openSheetGuideModal()" class="text-xs font-display font-bold text-white underline py-1 px-2">
+        <button onclick="openSheetGuideModal()" class="text-xs font-display font-bold text-slate-900 underline py-1 px-2">
           ¿Cómo autorizar la hoja?
         </button>
         <button onclick="loadSampleData()" class="btn-action-primary text-xs font-display font-bold rounded-lg px-3.5 py-1.5 transition">
@@ -218,12 +201,12 @@
     </div>
 
     <!-- FILTER & SEARCH CONTROLS -->
-    <section class="bg-mono-900 border border-mono-800 rounded-2xl p-3.5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+    <section class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
       
       <!-- Search Input -->
       <div class="relative flex-1">
-        <i data-lucide="search" class="w-4 h-4 text-mono-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-        <input type="text" id="search-input" oninput="renderLeads()" placeholder="Buscar por cliente, auto, teléfono o servicio..." class="w-full bg-black border border-mono-700 rounded-xl pl-9 pr-3 py-2 text-xs font-sans text-white placeholder-mono-500 focus:outline-none focus:border-white transition">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="search-input" oninput="renderLeads()" placeholder="Buscar por cliente, auto, teléfono o servicio..." class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs font-sans text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-slate-800 transition">
       </div>
 
       <!-- Filter by Status Pills -->
@@ -236,8 +219,8 @@
       </div>
 
       <!-- Filter by Operator -->
-      <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-mono-800 shrink-0">
-        <span class="text-[9px] font-display font-extrabold text-mono-400 px-2 uppercase tracking-wider">Ver:</span>
+      <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+        <span class="text-[9px] font-display font-extrabold text-slate-500 px-2 uppercase tracking-wider">Ver:</span>
         <button onclick="setOperatorFilter('ALL')" data-op-filter="ALL" class="op-pill active px-3 py-1 text-xs font-display font-bold rounded-lg">Todos</button>
         <button onclick="setOperatorFilter('Maximiliano')" data-op-filter="Maximiliano" class="op-pill px-3 py-1 text-xs font-display font-bold rounded-lg">Maxi</button>
         <button onclick="setOperatorFilter('Romina')" data-op-filter="Romina" class="op-pill px-3 py-1 text-xs font-display font-bold rounded-lg">Romi</button>
@@ -252,12 +235,12 @@
       </div>
 
       <!-- Empty State -->
-      <div id="empty-state" class="hidden text-center py-16 bg-mono-900 border border-mono-800 rounded-2xl">
-        <div class="w-14 h-14 rounded-2xl bg-mono-800 text-white flex items-center justify-center mx-auto mb-3 border border-mono-700">
+      <div id="empty-state" class="hidden text-center py-16 bg-white border border-slate-200 rounded-2xl shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-3 border border-slate-200">
           <i data-lucide="car" class="w-7 h-7"></i>
         </div>
-        <h3 class="font-serif text-lg font-bold text-white mb-1">No se encontraron solicitudes</h3>
-        <p class="font-sans text-xs text-mono-400 max-w-sm mx-auto mb-4">Ajustá la búsqueda o sincronizá para recibir las últimas respuestas del Google Form.</p>
+        <h3 class="font-serif text-lg font-bold text-slate-900 mb-1">No se encontraron solicitudes</h3>
+        <p class="font-sans text-xs text-slate-500 max-w-sm mx-auto mb-4">Ajustá la búsqueda o sincronizá para recibir las últimas respuestas del Google Form.</p>
         <button onclick="syncGoogleSheets()" class="btn-action-primary px-5 py-2.5 rounded-xl text-xs font-display font-bold transition inline-flex items-center gap-2 shadow-md">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sincronizar Ahora
         </button>
@@ -267,45 +250,45 @@
   </main>
 
   <!-- ==================== MODAL DE COTIZACIÓN & WHATSAPP ==================== -->
-  <div id="modal-cotizador" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-    <div class="bg-mono-900 border border-mono-700 rounded-3xl w-full max-w-3xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in">
+  <div id="modal-cotizador" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-3xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in">
       
       <!-- Modal Header -->
-      <div class="bg-black px-6 py-4 border-b border-mono-800 flex items-center justify-between">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
           <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center font-serif font-bold text-lg">
             <i data-lucide="calculator" class="w-5 h-5"></i>
           </div>
           <div>
-            <h2 class="font-serif text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-              Tasación Oficial • <span id="modal-lead-name" class="text-mono-200">Cliente</span>
+            <h2 class="font-serif text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+              Tasación Oficial • <span id="modal-lead-name" class="text-slate-900 underline">Cliente</span>
             </h2>
-            <p id="modal-lead-car-subtitle" class="font-display text-xs text-mono-400 tracking-wide font-medium">Vehículo • Tamaño</p>
+            <p id="modal-lead-car-subtitle" class="font-display text-xs text-slate-500 tracking-wide font-medium">Vehículo • Tamaño</p>
           </div>
         </div>
-        <button onclick="closeModalCotizador()" class="text-mono-400 hover:text-white p-2 rounded-xl bg-mono-800 hover:bg-mono-700 transition">
+        <button onclick="closeModalCotizador()" class="text-slate-500 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="p-6 overflow-y-auto space-y-5 text-xs text-mono-300">
+      <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-700 bg-white">
         
         <!-- Cliente & Vehículo Info Banner -->
-        <div class="bg-black border border-mono-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           <div>
-            <span class="text-[9px] font-display uppercase tracking-widest text-mono-400 font-extrabold block">Teléfono / WhatsApp</span>
+            <span class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block">Teléfono / WhatsApp</span>
             <div class="flex items-center gap-2 mt-1">
-              <span id="modal-lead-phone" class="font-mono font-bold text-white text-sm">--</span>
-              <a id="modal-lead-call-btn" href="#" target="_blank" class="text-white hover:text-mono-300 p-1" title="Llamar o abrir directo">
+              <span id="modal-lead-phone" class="font-mono font-bold text-slate-900 text-sm">--</span>
+              <a id="modal-lead-call-btn" href="#" target="_blank" class="text-slate-700 hover:text-slate-900 p-1" title="Llamar o abrir directo">
                 <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
               </a>
             </div>
           </div>
 
           <div>
-            <span class="text-[9px] font-display uppercase tracking-widest text-mono-400 font-extrabold block">Categoría de Vehículo</span>
-            <select id="modal-car-category" onchange="recalculateQuote()" class="mt-1 bg-mono-900 border border-mono-700 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-white w-full focus:outline-none">
+            <span class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block">Categoría de Vehículo</span>
+            <select id="modal-car-category" onchange="recalculateQuote()" class="mt-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 w-full focus:outline-none focus:border-slate-700">
               <option value="chico">Hatchback / Sedán Chico</option>
               <option value="mediano">Sedán Mediano / Grande</option>
               <option value="suv">SUV / Monovolumen / Rural</option>
@@ -315,28 +298,28 @@
           </div>
 
           <div>
-            <span class="text-[9px] font-display uppercase tracking-widest text-mono-400 font-extrabold block">Atendido Por</span>
-            <select id="modal-assigned-operator" onchange="updateOperatorForLead()" class="mt-1 bg-mono-900 border border-mono-700 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-white w-full focus:outline-none">
+            <span class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block">Atendido Por</span>
+            <select id="modal-assigned-operator" onchange="updateOperatorForLead()" class="mt-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900 w-full focus:outline-none focus:border-slate-700">
               <option value="Maximiliano">Maximiliano</option>
               <option value="Romina">Romina</option>
             </select>
           </div>
 
           <!-- Observaciones del cliente -->
-          <div id="modal-lead-notes-box" class="sm:col-span-3 bg-mono-900/60 p-3 rounded-xl border border-mono-800 text-[11px] font-sans text-mono-400">
-            <span class="text-white font-display font-bold uppercase tracking-wider text-[10px]">Detalles del cliente: </span>
-            <span id="modal-lead-notes" class="italic text-mono-200 font-normal">Sin notas adicionales</span>
+          <div id="modal-lead-notes-box" class="sm:col-span-3 bg-white p-3 rounded-xl border border-slate-200 text-[11px] font-sans text-slate-600">
+            <span class="text-slate-900 font-display font-bold uppercase tracking-wider text-[10px]">Detalles del cliente: </span>
+            <span id="modal-lead-notes" class="italic text-slate-800 font-normal">Sin notas adicionales</span>
           </div>
         </div>
 
         <!-- SECCIÓN 1: CALCULADORA DE DETALLADO -->
         <div>
           <div class="flex items-center justify-between mb-2.5">
-            <h3 class="text-[11px] font-display font-extrabold uppercase tracking-widest text-white flex items-center gap-2">
-              <i data-lucide="check-square" class="w-4 h-4 text-white"></i>
+            <h3 class="text-[11px] font-display font-extrabold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+              <i data-lucide="check-square" class="w-4 h-4 text-slate-900"></i>
               Servicios a Cotizar
             </h3>
-            <span class="text-[11px] font-sans text-mono-400">Tildá o destildá para sumar al presupuesto</span>
+            <span class="text-[11px] font-sans text-slate-500">Tildá o destildá para sumar al presupuesto</span>
           </div>
 
           <!-- Checkboxes de Servicios con Precios Dinámicos -->
@@ -346,39 +329,39 @@
         </div>
 
         <!-- SECCIÓN 2: AJUSTES (DESCUENTOS / RECARGOS / TIEMPO) -->
-        <div class="bg-black border border-mono-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           <div>
-            <label class="text-[10px] font-display font-bold uppercase tracking-wider text-mono-400 block mb-1">Descuento / Combo</label>
+            <label class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-600 block mb-1">Descuento / Combo</label>
             <div class="flex items-center gap-2">
-              <select id="modal-discount-type" onchange="recalculateQuote()" class="bg-mono-900 border border-mono-700 rounded-lg px-2.5 py-1.5 text-xs font-sans text-white focus:outline-none">
+              <select id="modal-discount-type" onchange="recalculateQuote()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-sans text-slate-900 focus:outline-none">
                 <option value="none">Sin Descuento</option>
                 <option value="10">10% Off Combo</option>
                 <option value="15">15% Off Especial</option>
                 <option value="custom">Monto Fijo $</option>
               </select>
-              <input type="number" id="modal-discount-custom" oninput="recalculateQuote()" placeholder="$0" class="hidden w-24 bg-mono-900 border border-mono-700 rounded-lg px-2 py-1 text-xs font-mono text-white">
+              <input type="number" id="modal-discount-custom" oninput="recalculateQuote()" placeholder="$0" class="hidden w-24 bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-mono text-slate-900">
             </div>
           </div>
 
           <div>
-            <label class="text-[10px] font-display font-bold uppercase tracking-wider text-mono-400 block mb-1">Recargo (Suciedad extrema/pelos)</label>
-            <input type="number" id="modal-surcharge" oninput="recalculateQuote()" placeholder="$0" class="w-full bg-mono-900 border border-mono-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none">
+            <label class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-600 block mb-1">Recargo (Suciedad extrema/pelos)</label>
+            <input type="number" id="modal-surcharge" oninput="recalculateQuote()" placeholder="$0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-900 focus:outline-none">
           </div>
 
           <div>
-            <label class="text-[10px] font-display font-bold uppercase tracking-wider text-mono-400 block mb-1">Tiempo Estimado en Taller</label>
-            <input type="text" id="modal-time-estimate" oninput="updatePreviewMessage()" placeholder="Ej: 4 a 6 horas / 1 día" class="w-full bg-mono-900 border border-mono-700 rounded-lg px-2.5 py-1.5 text-xs font-sans text-white focus:outline-none">
+            <label class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-600 block mb-1">Tiempo Estimado en Taller</label>
+            <input type="text" id="modal-time-estimate" oninput="updatePreviewMessage()" placeholder="Ej: 4 a 6 horas / 1 día" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-sans text-slate-900 focus:outline-none">
           </div>
         </div>
 
-        <!-- TOTAL DESTACADO ESTILO CARVLAK -->
-        <div class="highlight-box bg-black border border-white/20 rounded-2xl p-5 flex items-center justify-between shadow-lg transition-all">
+        <!-- TOTAL DESTACADO (Alto impacto visual) -->
+        <div class="highlight-box rounded-2xl p-5 flex items-center justify-between shadow-sm transition-all">
           <div>
-            <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-mono-400">TOTAL TASACIÓN DETAILVLAK</div>
-            <div class="text-xs font-mono text-mono-400 mt-0.5" id="modal-calc-breakdown">Subtotal: $0</div>
+            <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">TOTAL TASACIÓN DETAILVLAK</div>
+            <div class="text-xs font-mono text-slate-600 mt-0.5" id="modal-calc-breakdown">Subtotal: $0</div>
           </div>
           <div class="text-right">
-            <div class="font-serif text-3xl sm:text-4xl font-black text-white leading-tight" id="modal-total-display">$0 <span class="font-sans text-xs text-mono-400 font-medium">UYU</span></div>
+            <div class="font-serif text-3xl sm:text-4xl font-black text-slate-900 leading-tight" id="modal-total-display">$0 <span class="font-sans text-xs text-slate-500 font-medium">UYU</span></div>
             <span class="brand-badge text-[9px] font-display font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full inline-block mt-1">Cotización Lista</span>
           </div>
         </div>
@@ -386,15 +369,15 @@
         <!-- SECCIÓN 3: PLANTILLAS DE WHATSAPP -->
         <div class="space-y-2.5">
           <div class="flex items-center justify-between">
-            <h3 class="text-[11px] font-display font-extrabold uppercase tracking-widest text-white flex items-center gap-2">
-              <i data-lucide="message-square" class="w-4 h-4 text-white"></i>
+            <h3 class="text-[11px] font-display font-extrabold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-slate-900"></i>
               Mensaje Automático para WhatsApp
             </h3>
-            <span class="text-[11px] font-sans text-mono-400">Elegí la plantilla y editala libremente</span>
+            <span class="text-[11px] font-sans text-slate-500">Elegí la plantilla y editala libremente</span>
           </div>
 
           <!-- Selector de Plantilla Tabs -->
-          <div class="flex flex-wrap gap-1.5 bg-black p-1 rounded-xl border border-mono-800">
+          <div class="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
             <button onclick="setMsgTemplate('formal')" data-template-btn="formal" class="template-tab active px-3 py-1.5 text-xs font-display font-bold rounded-lg">✨ Formal Detallada</button>
             <button onclick="setMsgTemplate('promo')" data-template-btn="promo" class="template-tab px-3 py-1.5 text-xs font-display font-bold rounded-lg">🎁 Promo Combo</button>
             <button onclick="setMsgTemplate('fotos')" data-template-btn="fotos" class="template-tab px-3 py-1.5 text-xs font-display font-bold rounded-lg">📸 Pedir Fotos</button>
@@ -404,8 +387,8 @@
 
           <!-- Cuadro de Texto Previsualizable y Editable -->
           <div class="relative">
-            <textarea id="modal-whatsapp-preview" rows="7" class="w-full bg-black border border-mono-700 rounded-xl p-3.5 text-xs font-mono text-mono-100 focus:outline-none focus:border-white leading-relaxed"></textarea>
-            <button onclick="copyWhatsAppMessage()" class="absolute right-3 top-3 px-2.5 py-1.5 bg-mono-800 hover:bg-mono-700 text-white rounded-lg text-[10px] font-display font-bold flex items-center gap-1.5 border border-mono-700 transition" title="Copiar texto">
+            <textarea id="modal-whatsapp-preview" rows="7" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-slate-800 leading-relaxed"></textarea>
+            <button onclick="copyWhatsAppMessage()" class="absolute right-3 top-3 px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-800 rounded-lg text-[10px] font-display font-bold flex items-center gap-1.5 border border-slate-300 shadow-sm transition" title="Copiar texto">
               <i data-lucide="copy" class="w-3.5 h-3.5"></i>
               <span id="copy-btn-text">Copiar</span>
             </button>
@@ -415,10 +398,10 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="bg-black px-6 py-4 border-t border-mono-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2 w-full sm:w-auto">
-          <span class="text-xs font-display font-bold text-mono-400">Estado:</span>
-          <select id="modal-lead-status" class="bg-mono-900 border border-mono-700 rounded-xl px-3 py-1.5 text-xs font-display font-bold text-white focus:outline-none">
+          <span class="text-xs font-display font-bold text-slate-600">Estado:</span>
+          <select id="modal-lead-status" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-display font-bold text-slate-900 focus:outline-none">
             <option value="NUEVO">🟡 Por Cotizar</option>
             <option value="COTIZADO" selected>🟣 Presupuesto Enviado</option>
             <option value="TURNO">🟢 Turno Confirmado</option>
@@ -428,7 +411,7 @@
         </div>
 
         <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-          <button onclick="saveLeadQuoteOnly()" class="px-4 py-2.5 bg-mono-800 hover:bg-mono-700 text-white border border-mono-700 rounded-xl text-xs font-display font-bold transition">
+          <button onclick="saveLeadQuoteOnly()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold transition shadow-sm">
             Guardar
           </button>
 
@@ -444,34 +427,34 @@
   </div>
 
   <!-- ==================== MODAL DE TARIFARIO (CONFIGURABLE) ==================== -->
-  <div id="modal-tarifario" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-3 overflow-y-auto">
-    <div class="bg-mono-900 border border-mono-700 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+  <div id="modal-tarifario" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
       
-      <div class="bg-black px-6 py-4 border-b border-mono-800 flex items-center justify-between">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
           <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center font-serif">
             <i data-lucide="sliders" class="w-5 h-5"></i>
           </div>
           <div>
-            <h2 class="font-serif text-xl font-bold text-white">Tarifario de Precios Base ($ UYU)</h2>
-            <p class="font-sans text-xs text-mono-400">Modificá los precios de DetailVlak según el tamaño del vehículo</p>
+            <h2 class="font-serif text-xl font-bold text-slate-900">Tarifario de Precios Base ($ UYU)</h2>
+            <p class="font-sans text-xs text-slate-500">Modificá los precios de DetailVlak según el tamaño del vehículo</p>
           </div>
         </div>
-        <button onclick="closeModalTarifario()" class="text-mono-400 hover:text-white p-2 rounded-xl bg-mono-800">
+        <button onclick="closeModalTarifario()" class="text-slate-500 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="p-6 overflow-y-auto space-y-4 text-xs font-sans">
-        <p class="text-mono-400">
+      <div class="p-6 overflow-y-auto space-y-4 text-xs font-sans bg-white">
+        <p class="text-slate-600">
           Estos valores se usan como base para calcular automáticamente los presupuestos cuando los clientes llenan el Google Form. Podés ajustarlos en cualquier momento.
         </p>
 
         <!-- Tabla Responsive de Tarifas -->
-        <div class="overflow-x-auto border border-mono-800 rounded-2xl">
-          <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm">
+          <table class="w-full text-left border-collapse bg-white">
             <thead>
-              <tr class="bg-black text-mono-400 text-[10px] font-display font-extrabold uppercase tracking-widest border-b border-mono-800">
+              <tr class="bg-slate-50 text-slate-700 text-[10px] font-display font-extrabold uppercase tracking-widest border-b border-slate-200">
                 <th class="py-3 px-3.5">Servicio de Detailing</th>
                 <th class="py-3 px-2 text-center">Chico</th>
                 <th class="py-3 px-2 text-center">Mediano</th>
@@ -480,18 +463,18 @@
                 <th class="py-3 px-2 text-center">Moto</th>
               </tr>
             </thead>
-            <tbody id="tarifario-table-body" class="divide-y divide-mono-800/80 font-medium">
+            <tbody id="tarifario-table-body" class="divide-y divide-slate-200 font-medium">
               <!-- Renderizado por JS -->
             </tbody>
           </table>
         </div>
 
         <div class="flex items-center justify-between pt-2">
-          <button onclick="resetDefaultTarifario()" class="text-xs font-display font-semibold text-mono-400 hover:text-white underline">
+          <button onclick="resetDefaultTarifario()" class="text-xs font-display font-semibold text-slate-600 hover:text-slate-900 underline">
             Restablecer valores originales
           </button>
           <div class="flex gap-2.5">
-            <button onclick="closeModalTarifario()" class="px-4 py-2 bg-mono-800 hover:bg-mono-700 text-mono-200 rounded-xl font-display font-bold">Cancelar</button>
+            <button onclick="closeModalTarifario()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-display font-bold">Cancelar</button>
             <button onclick="saveTarifario()" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold transition">Guardar Precios</button>
           </div>
         </div>
@@ -501,64 +484,64 @@
   </div>
 
   <!-- ==================== MODAL DE CONFIGURACIÓN & NEGOCIO ==================== -->
-  <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-3 overflow-y-auto">
-    <div class="bg-mono-900 border border-mono-700 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+  <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
       
-      <div class="bg-black px-6 py-4 border-b border-mono-800 flex items-center justify-between">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
           <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center font-serif">
             <i data-lucide="settings" class="w-5 h-5"></i>
           </div>
           <div>
-            <h2 class="font-serif text-xl font-bold text-white">Configuración del Taller</h2>
-            <p class="font-sans text-xs text-mono-400">Datos de DetailVlak y vinculación con Google Sheets</p>
+            <h2 class="font-serif text-xl font-bold text-slate-900">Configuración del Taller</h2>
+            <p class="font-sans text-xs text-slate-500">Datos de DetailVlak y vinculación con Google Sheets</p>
           </div>
         </div>
-        <button onclick="closeModalSettings()" class="text-mono-400 hover:text-white p-2 rounded-xl bg-mono-800">
+        <button onclick="closeModalSettings()" class="text-slate-500 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="p-6 overflow-y-auto space-y-4 text-xs font-sans">
+      <div class="p-6 overflow-y-auto space-y-4 text-xs font-sans bg-white">
         
         <div>
-          <label class="block text-white font-display font-bold mb-1">Enlace de la Hoja de Cálculo de Google Forms</label>
-          <input type="text" id="setting-sheet-url" class="w-full bg-black border border-mono-700 rounded-xl px-3 py-2 text-xs font-mono text-mono-200" placeholder="https://docs.google.com/spreadsheets/d/...">
-          <p class="text-[11px] text-mono-500 mt-1">La hoja vinculada a las respuestas del formulario de DetailVlak.</p>
+          <label class="block text-slate-900 font-display font-bold mb-1">Enlace de la Hoja de Cálculo de Google Forms</label>
+          <input type="text" id="setting-sheet-url" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 focus:bg-white focus:outline-none" placeholder="https://docs.google.com/spreadsheets/d/...">
+          <p class="text-[11px] text-slate-500 mt-1">La hoja vinculada a las respuestas del formulario de DetailVlak.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
-            <label class="block text-white font-display font-bold mb-1">Nombre del Taller</label>
-            <input type="text" id="setting-shop-name" value="DetailVlak" class="w-full bg-black border border-mono-700 rounded-xl px-3 py-2 text-xs font-sans text-white">
+            <label class="block text-slate-900 font-display font-bold mb-1">Nombre del Taller</label>
+            <input type="text" id="setting-shop-name" value="DetailVlak" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-sans text-slate-900 focus:bg-white focus:outline-none">
           </div>
           <div>
-            <label class="block text-white font-display font-bold mb-1">Ubicación / Dirección</label>
-            <input type="text" id="setting-shop-address" value="Av. Giannattasio y, 15000 Shangrilá, Canelones" class="w-full bg-black border border-mono-700 rounded-xl px-3 py-2 text-xs font-sans text-white">
+            <label class="block text-slate-900 font-display font-bold mb-1">Ubicación / Dirección</label>
+            <input type="text" id="setting-shop-address" value="Av. Giannattasio y, 15000 Shangrilá, Canelones" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-sans text-slate-900 focus:bg-white focus:outline-none">
           </div>
         </div>
 
         <!-- Guía de conexión rápida -->
-        <div class="bg-black border border-mono-800 rounded-2xl p-4 space-y-2">
-          <div class="font-display font-bold text-white flex items-center gap-2 text-xs uppercase tracking-wider">
-            <i data-lucide="key" class="w-4 h-4 text-white"></i>
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+          <div class="font-display font-bold text-slate-900 flex items-center gap-2 text-xs uppercase tracking-wider">
+            <i data-lucide="key" class="w-4 h-4 text-slate-900"></i>
             ¿Cómo autorizar la hoja para sincronización automática?
           </div>
-          <ol class="list-decimal list-inside space-y-1 text-mono-400 text-[11px] leading-relaxed">
+          <ol class="list-decimal list-inside space-y-1 text-slate-600 text-[11px] leading-relaxed">
             <li>Abrí tu Google Sheet en el navegador.</li>
-            <li>Tocá el botón verde <strong class="text-white">"Compartir"</strong> arriba a la derecha.</li>
-            <li>En <strong class="text-white">"Acceso general"</strong>, cambiá de <em>Restringido</em> a <strong class="text-white">"Cualquier persona que tenga el vínculo"</strong> (rol: <em>Lector</em>).</li>
+            <li>Tocá el botón verde <strong class="text-slate-900">"Compartir"</strong> arriba a la derecha.</li>
+            <li>En <strong class="text-slate-900">"Acceso general"</strong>, cambiá de <em>Restringido</em> a <strong class="text-slate-900">"Cualquier persona que tenga el vínculo"</strong> (rol: <em>Lector</em>).</li>
             <li>¡Listo! La app leerá en tiempo real todas las respuestas sin pedir contraseñas.</li>
           </ol>
         </div>
 
         <!-- Acciones -->
-        <div class="pt-2 border-t border-mono-800 flex items-center justify-between">
-          <button onclick="loadSampleData()" class="text-xs font-display font-bold text-mono-300 hover:text-white underline">
+        <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+          <button onclick="loadSampleData()" class="text-xs font-display font-bold text-slate-700 hover:text-slate-900 underline">
             Cargar consultas de prueba
           </button>
           <div class="flex gap-2.5">
-            <button onclick="closeModalSettings()" class="px-4 py-2 bg-mono-800 text-mono-200 rounded-xl font-display font-bold">Cerrar</button>
+            <button onclick="closeModalSettings()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-display font-bold">Cerrar</button>
             <button onclick="saveSettings()" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold transition">Guardar</button>
           </div>
         </div>
@@ -569,8 +552,8 @@
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-mono-900 text-white border border-mono-700 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-display font-bold">
-    <i data-lucide="check-circle" class="w-4 h-4 text-white"></i>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white border border-slate-700 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-display font-bold">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
     <span id="toast-message">Operación exitosa</span>
   </div>
 

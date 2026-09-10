@@ -1,4 +1,4 @@
-/* DetailVlak - Monochrome CarVlak & Romina Black/Pink Theme */
+/* DetailVlak - High-Contrast Daylight & Outdoor Legibility (Estilo CarVlak) */
 
 :root {
   --font-sans: 'Instrument Sans', system-ui, -apple-system, sans-serif;
@@ -6,108 +6,112 @@
   --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'Space Mono', monospace;
 
-  /* Colores Maxi por defecto (Monocromático Blanco y Negro) */
-  --accent-color: #ffffff;
-  --accent-text: #000000;
-  --accent-hover: #e4e4e7;
-  --accent-glow: rgba(255, 255, 255, 0.15);
-  --accent-border: rgba(255, 255, 255, 0.3);
-  --accent-subtle: rgba(255, 255, 255, 0.1);
-  --badge-bg: #ffffff;
-  --badge-text: #000000;
+  /* Modo Maxi: Blanco de fondo, Negro profundo para textos y botones */
+  --bg-main: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --border-color: #E2E8F0;
+  --border-hover: #94A3B8;
+  --text-main: #09090B;
+  --text-muted: #64748B;
+  
+  --accent-color: #000000;
+  --accent-text: #FFFFFF;
+  --accent-hover: #27272A;
+  --accent-glow: rgba(0, 0, 0, 0.08);
+  --badge-bg: #000000;
+  --badge-text: #FFFFFF;
 }
 
-/* TEMA ROMINA: Mayoritariamente Negro con acentos en Rosa Eléctrico / Rose Gold */
+/* Modo Romina: Blanco de fondo, Negro para textos, Acentos y Botones en Rosa Fuerte */
 [data-operator="romina"] {
-  --accent-color: #ff2d78;
-  --accent-text: #ffffff;
-  --accent-hover: #ff4d8f;
-  --accent-glow: rgba(255, 45, 120, 0.35);
-  --accent-border: rgba(255, 45, 120, 0.4);
-  --accent-subtle: rgba(255, 45, 120, 0.12);
-  --badge-bg: #ff2d78;
-  --badge-text: #ffffff;
+  --accent-color: #E11D48; /* Rose / Pink de alto contraste para visibilidad al sol */
+  --accent-text: #FFFFFF;
+  --accent-hover: #BE123C;
+  --accent-glow: rgba(225, 29, 72, 0.2);
+  --badge-bg: #E11D48;
+  --badge-text: #FFFFFF;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #000000;
-  color: #e4e4e7;
+  background-color: var(--bg-main);
+  color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-  transition: background-color 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1, h2, h3, .font-heading {
   font-family: var(--font-serif);
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - High Contrast */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: #94A3B8;
 }
 
 /* Brand Logo Box */
 .brand-logo-box {
   background-color: var(--accent-color);
   color: var(--accent-text);
-  box-shadow: 0 2px 12px var(--accent-glow);
+  box-shadow: 0 2px 8px var(--accent-glow);
   transition: all 0.25s ease;
 }
 
 .brand-badge {
-  background-color: var(--accent-color);
-  color: var(--accent-text);
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
   transition: all 0.25s ease;
 }
 
-/* Operadores Switcher */
+/* Operadores Switcher (Alto Contraste) */
 .user-btn {
-  color: #a1a1aa;
+  color: #64748B;
   transition: all 0.2s ease;
 }
 
-/* Maxi Activo */
+/* Maxi Activo: Negro profundo con texto blanco */
 [data-operator="maxi"] #btn-user-maxi.active,
 #btn-user-maxi.active {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #000000;
+  color: #FFFFFF;
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 [data-operator="maxi"] #btn-user-maxi.active span,
 #btn-user-maxi.active span {
-  background-color: #000000;
+  background-color: #FFFFFF;
 }
 
-/* Romi Activo */
+/* Romi Activo: Rosa fuerte con texto blanco */
 [data-operator="romina"] #btn-user-romi.active {
-  background-color: #ff2d78;
-  color: #ffffff;
+  background-color: #E11D48;
+  color: #FFFFFF;
   font-weight: 800;
-  box-shadow: 0 2px 15px rgba(255, 45, 120, 0.4);
+  box-shadow: 0 2px 10px rgba(225, 29, 72, 0.3);
 }
 [data-operator="romina"] #btn-user-romi.active span {
-  background-color: #ffffff;
+  background-color: #FFFFFF;
 }
 
-/* Botón de Acción Principal */
+/* Botón de Acción Principal (Visible bajo el sol) */
 .btn-action-primary {
   background-color: var(--accent-color) !important;
   color: var(--accent-text) !important;
-  box-shadow: 0 4px 14px var(--accent-glow) !important;
+  box-shadow: 0 2px 10px var(--accent-glow) !important;
   transition: all 0.2s ease;
 }
 .btn-action-primary:hover {
@@ -116,70 +120,87 @@ h1, h2, h3, .font-heading {
 
 /* Filter pills */
 .filter-pill {
-  background: #09090b;
-  color: #a1a1aa;
-  border: 1px solid #27272a;
+  background: #FFFFFF;
+  color: #475569;
+  border: 1px solid #E2E8F0;
   transition: all 0.15s ease;
 }
 .filter-pill:hover {
-  background: #18181b;
-  color: #ffffff;
-  border-color: #3f3f46;
+  background: #F8FAFC;
+  color: #09090B;
+  border-color: #CBD5E1;
 }
 .filter-pill.active {
   background: var(--accent-color);
   color: var(--accent-text);
   border-color: var(--accent-color);
   font-weight: 800;
-  box-shadow: 0 4px 12px var(--accent-glow);
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
 
-/* Operator pills */
+/* Operator filter pills */
 .op-pill {
-  color: #71717a;
+  color: #64748B;
   transition: all 0.15s ease;
 }
 .op-pill:hover {
-  color: #ffffff;
+  color: #09090B;
 }
 .op-pill.active {
-  background: #27272a;
-  color: #ffffff;
-  font-weight: 700;
+  background: #E2E8F0;
+  color: #09090B;
+  font-weight: 800;
 }
 [data-operator="romina"] .op-pill.active {
-  background: rgba(255, 45, 120, 0.2);
-  color: #ff4d8f;
-  border: 1px solid rgba(255, 45, 120, 0.3);
+  background: #FFE4E6;
+  color: #BE123C;
+  border: 1px solid #FDA4AF;
 }
 
 /* Template tabs */
 .template-tab {
-  background: #000000;
-  color: #a1a1aa;
-  border: 1px solid #27272a;
+  background: #FFFFFF;
+  color: #64748B;
+  border: 1px solid #E2E8F0;
   transition: all 0.15s ease;
 }
 .template-tab:hover {
-  background: #18181b;
-  color: #ffffff;
+  background: #F8FAFC;
+  color: #09090B;
 }
 .template-tab.active {
   background: var(--accent-color);
   color: var(--accent-text);
   border-color: var(--accent-color);
   font-weight: 800;
-  box-shadow: 0 2px 10px var(--accent-glow);
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
 
-/* Lead Cards */
+/* Lead Cards - Crisp white cards with clear borders */
 .lead-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 .lead-card:hover {
   transform: translateY(-3px);
-  border-color: var(--accent-border);
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
+  border-color: #94A3B8;
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+[data-operator="romina"] .lead-card:hover {
+  border-color: #FDA4AF;
+  box-shadow: 0 10px 20px -5px rgba(225, 29, 72, 0.1);
+}
+
+/* Highlight Box (Total Cotización) */
+.highlight-box {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+}
+[data-operator="romina"] .highlight-box {
+  background-color: #FFF1F2;
+  border-color: #FECDD3 !important;
 }
 
 /* Animations */
@@ -203,15 +224,9 @@ input[type="checkbox"] {
   accent-color: var(--accent-color);
 }
 
-/* Safe touch area for iPhone */
+/* Touch targets on iPhone */
 @supports (-webkit-touch-callout: none) {
   button, select, input {
-    min-height: 38px;
+    min-height: 40px;
   }
-}
-
-/* Romina specific badge highlight */
-[data-operator="romina"] .highlight-box {
-  border-color: rgba(255, 45, 120, 0.35) !important;
-  box-shadow: 0 0 25px rgba(255, 45, 120, 0.1) !important;
 }

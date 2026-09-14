@@ -30,7 +30,7 @@ Para que Maxi y Romi tengan la misma app siempre sincronizada desde cualquier lu
 
 Tu Google Sheet ya está preconfigurado en la app (`1CCKm7B1q3YtC85SUp5Ub25u4t1DRhZ_0rlyHWCRurgg`). Para que la aplicación pueda leer las respuestas automáticamente en vivo sin pedir contraseñas:
 
-1. Abrí la planilla de Google Sheets: [Ver Google Sheet](https://docs.google.com/spreadsheets/d/1CCKm7B1q3YtC85SUp5Ub25u4t1DRhZ_0rlyHWCRurgg/edit?gid=1975903270)
+1. Abrí la planilla de Google Sheets: [Ver Google Sheet](https://docs.google.com/spreadsheets/d/1CCKm7B1q3YtC85SUp5Ub25u4t1DRhZ_0rlyHWCRurgg/edit?gid=2130104281)
 2. Hacé clic en el botón verde **"Compartir"** (arriba a la derecha).
 3. En **Acceso general**, cambiá de *Restringido* a **"Cualquier persona que tenga el vínculo"** (en rol *Lector*).
 4. Tocá **Listo**.

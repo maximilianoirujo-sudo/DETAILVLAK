@@ -8,7 +8,7 @@
 const DEFAULT_CONFIG = {
   shopName: "DetailVlak",
   shopAddress: "Av. Giannattasio y, 15000 Shangrilá, Canelones",
-  sheetUrl: "https://docs.google.com/spreadsheets/d/1CCKm7B1q3YtC85SUp5Ub25u4t1DRhZ_0rlyHWCRurgg/edit?resourcekey=&gid=1975903270#gid=1975903270",
+  sheetUrl: "https://docs.google.com/spreadsheets/d/1CCKm7B1q3YtC85SUp5Ub25u4t1DRhZ_0rlyHWCRurgg/edit?resourcekey=&gid=2130104281#gid=2130104281",
   activeUser: "Maximiliano"
 };
 
@@ -178,7 +178,17 @@ document.addEventListener("DOMContentLoaded", () => {
 function loadStoredData() {
   try {
     const savedConfig = localStorage.getItem("detailvlak_config");
-    if (savedConfig) appState.config = { ...DEFAULT_CONFIG, ...JSON.parse(savedConfig) };
+    if (savedConfig) {
+      appState.config = { ...DEFAULT_CONFIG, ...JSON.parse(savedConfig) };
+      // Migración automática si la URL guardada en el dispositivo corresponde a la pestaña anterior
+      if (appState.config.sheetUrl && (appState.config.sheetUrl.includes("1975903270") || !appState.config.sheetUrl.includes("2130104281"))) {
+        appState.config.sheetUrl = DEFAULT_CONFIG.sheetUrl;
+        saveConfig();
+      }
+    } else {
+      appState.config = { ...DEFAULT_CONFIG };
+      saveConfig();
+    }
 
     const savedTariffs = localStorage.getItem("detailvlak_tariffs");
     if (savedTariffs) appState.tariffs = JSON.parse(savedTariffs);
@@ -305,15 +315,15 @@ function parseGoogleSheetsCSV(csvText) {
 
   const headers = rows[0].map(h => (h || "").trim().toLowerCase());
 
-  const colTimestamp = headers.findIndex(h => h.includes("marca") || h.includes("fecha") || h.includes("time"));
+  const colTimestamp = headers.findIndex(h => h.includes("timestamp") || h.includes("marca temporal") || h.includes("marca de hora") || (h.includes("fecha") && !h.includes("turno") && !h.includes("coordinar")) || h.includes("time"));
   const colName = headers.findIndex(h => h.includes("nombre"));
   const colPhone = headers.findIndex(h => h.includes("whatsapp") || h.includes("tel") || h.includes("cel"));
-  const colVehicle = headers.findIndex(h => h.includes("vehículo") || h.includes("vehiculo") || h.includes("marca") || h.includes("modelo") || h.includes("auto"));
-  const colCategory = headers.findIndex(h => h.includes("categoría") || h.includes("categoria") || h.includes("tamaño"));
+  const colVehicle = headers.findIndex(h => (h.includes("vehículo") || h.includes("vehiculo") || h.includes("auto") || h.includes("modelo")) && !h.includes("categoría") && !h.includes("categoria") && !h.includes("tamaño") && !h.includes("tamano"));
+  const colCategory = headers.findIndex(h => h.includes("categoría") || h.includes("categoria") || h.includes("tamaño") || h.includes("tamano"));
   const colColor = headers.findIndex(h => h.includes("color"));
   const colServices = headers.findIndex(h => h.includes("servicio") || h.includes("servicios") || h.includes("realizarle"));
   const colNotes = headers.findIndex(h => h.includes("detalle") || h.includes("prioridad") || h.includes("observ"));
-  const colDate = headers.findIndex(h => h.includes("fecha") || h.includes("turno") || h.includes("cuándo") || h.includes("cuando"));
+  const colDate = headers.findIndex(h => h.includes("turno") || h.includes("cuándo") || h.includes("cuando") || (h.includes("fecha") && !h.includes("timestamp")));
   const colSource = headers.findIndex(h => h.includes("conociste") || h.includes("viste") || h.includes("origen"));
 
   let newCount = 0;
@@ -410,9 +420,10 @@ function parseCSVToArray(text) {
 function normalizeCarCategory(str) {
   const s = (str || "").toLowerCase();
   if (s.includes("moto")) return "moto";
-  if (s.includes("pick") || s.includes("camioneta") || s.includes("hilux") || s.includes("amarok") || s.includes("ranger")) return "pickup";
-  if (s.includes("suv") || s.includes("rural") || s.includes("tracker") || s.includes("compass") || s.includes("duster")) return "suv";
-  if (s.includes("sedán mediano") || s.includes("sedan") || s.includes("vento") || s.includes("corolla") || s.includes("cruze") || s.includes("focus")) return "mediano";
+  if (s.includes("pick") || s.includes("utilitario") || s.includes("camioneta grande") || s.includes("hilux") || s.includes("amarok") || s.includes("ranger")) return "pickup";
+  if (s.includes("suv") || s.includes("tracker") || s.includes("compass") || s.includes("duster") || s.includes("compacta")) return "suv";
+  if (s.includes("chico") || s.includes("hatchback")) return "chico";
+  if (s.includes("sedán mediano") || s.includes("sedan") || s.includes("mediano") || s.includes("rural") || s.includes("vento") || s.includes("corolla") || s.includes("cruze") || s.includes("focus")) return "mediano";
   return "chico";
 }
 

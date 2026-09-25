@@ -39,8 +39,14 @@ body {
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  padding-bottom: max(5.5rem, env(safe-area-inset-bottom));
   transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 2.5rem;
+  }
 }
 
 h1, h2, h3, .font-heading {
@@ -75,6 +81,39 @@ h1, h2, h3, .font-heading {
   background-color: var(--badge-bg);
   color: var(--badge-text);
   transition: all 0.25s ease;
+}
+
+/* Main Navigation Tabs (Desktop & Mobile) */
+.nav-tab {
+  color: #475569;
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+.nav-tab:hover {
+  color: #09090B;
+  background-color: #F1F5F9;
+}
+.nav-tab.active {
+  background-color: var(--accent-color);
+  color: var(--accent-text);
+  font-weight: 800;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+/* Mobile Bottom Navigation Bar */
+.mobile-nav-btn {
+  color: #64748B;
+  transition: all 0.15s ease;
+}
+.mobile-nav-btn.active {
+  color: var(--accent-color);
+  font-weight: 800;
+}
+.mobile-nav-btn.active .mobile-nav-pill {
+  background-color: var(--accent-color);
+  color: var(--accent-text);
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
 
 /* Operadores Switcher (Alto Contraste) */
@@ -176,7 +215,7 @@ h1, h2, h3, .font-heading {
   box-shadow: 0 2px 8px var(--accent-glow);
 }
 
-/* Lead Cards - Crisp white cards with clear borders */
+/* Lead Cards & Module Cards - Crisp white cards with clear borders */
 .lead-card {
   background-color: #FFFFFF;
   border: 1px solid #E2E8F0;
@@ -184,13 +223,23 @@ h1, h2, h3, .font-heading {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 .lead-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #94A3B8;
   box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
 }
 [data-operator="romina"] .lead-card:hover {
   border-color: #FDA4AF;
   box-shadow: 0 10px 20px -5px rgba(225, 29, 72, 0.1);
+}
+
+/* Stock Alert Cards */
+.stock-card-critical {
+  border-color: #FCA5A5 !important;
+  background: linear-gradient(to bottom, #FEF2F2 0%, #FFFFFF 35%) !important;
+}
+.stock-card-warning {
+  border-color: #FCD34D !important;
+  background: linear-gradient(to bottom, #FFFBEB 0%, #FFFFFF 35%) !important;
 }
 
 /* Highlight Box (Total Cotización) */
@@ -201,6 +250,19 @@ h1, h2, h3, .font-heading {
 [data-operator="romina"] .highlight-box {
   background-color: #FFF1F2;
   border-color: #FECDD3 !important;
+}
+
+/* Dashboard Chart Bars */
+.chart-bar-income {
+  background-color: var(--accent-color);
+  transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.chart-bar-expense {
+  background-color: #94A3B8;
+  transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-operator="romina"] .chart-bar-expense {
+  background-color: #334155;
 }
 
 /* Animations */

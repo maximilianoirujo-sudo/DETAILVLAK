@@ -40,33 +40,36 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-[#F8FAFC] text-slate-900 min-h-screen font-sans antialiased pb-20 md:pb-8 selection:bg-black selection:text-white">
+<body class="bg-[#F8FAFC] text-slate-900 min-h-screen font-sans antialiased selection:bg-black selection:text-white">
 
   <!-- TOP ANNOUNCEMENT BAR (Estilo CarVlak Oficial #1E2B31) -->
   <div class="bg-[#1E2B31] text-slate-200 px-4 py-2 text-[11px] font-display font-medium border-b border-slate-700 tracking-wide">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-4">
       <div class="flex items-center space-x-2">
-        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="cloud-status-dot" class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="font-bold text-white uppercase tracking-wider text-[10px]">Taller en Shangrilá:</span>
         <span class="text-slate-300">Av. Giannattasio y, 15000 Shangrilá • Canelones, Uruguay</span>
       </div>
-      <div class="flex items-center space-x-4 text-slate-300">
-        <span class="hidden md:inline text-[10px] uppercase tracking-widest">Estética Automotriz & Detailing de Precisión</span>
-        <span class="text-white font-mono font-bold text-[11px]">CARVLAK GROUP</span>
+      <div class="flex items-center space-x-3 text-slate-300">
+        <button onclick="openSettingsModal()" id="cloud-sync-pill" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-[10px] font-mono text-emerald-300 border border-slate-600 transition cursor-pointer" title="Estado de sincronización con Google Sheets">
+          <i data-lucide="cloud" class="w-3 h-3"></i>
+          <span id="cloud-sync-text">Google Sheets Activo</span>
+        </button>
+        <span class="text-white font-mono font-bold text-[11px] hidden sm:inline">CARVLAK GROUP</span>
       </div>
     </div>
   </div>
 
   <!-- MAIN HEADER / NAVIGATION (Blanco nítido de alto contraste) -->
-  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-4 py-3">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       
       <!-- Brand Logo Oficial Detail VLAK -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchMainTab('tasaciones')">
         <img 
           src="logo.jpg" 
           alt="Detail VLAK" 
-          class="h-11 sm:h-12 w-auto object-contain rounded-xl border border-slate-200 shadow-sm transition-transform hover:scale-105"
+          class="h-10 sm:h-12 w-auto object-contain rounded-xl border border-slate-200 shadow-sm transition-transform hover:scale-105"
         />
         <div class="hidden sm:block border-l border-slate-200 pl-3">
           <div class="flex items-center gap-2">
@@ -74,185 +77,732 @@
               DETAIL VLAK
             </span>
             <span class="brand-badge text-[9px] font-display font-extrabold tracking-widest px-1.5 py-0.5 rounded uppercase">
-              STUDIO
+              ERP & CRM
             </span>
           </div>
-          <p class="text-[10px] font-sans text-slate-500 tracking-wide mt-0.5">Tasación Inteligente • WhatsApp CRM</p>
+          <p class="text-[10px] font-sans text-slate-500 tracking-wide mt-0.5">Tasaciones • Stock • Gastos • Comisiones</p>
         </div>
       </div>
 
       <!-- Operator Switcher (Maximiliano / Romina) -->
       <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
-        <span class="text-[10px] font-display font-bold uppercase tracking-widest text-slate-500 px-2.5 hidden sm:inline flex items-center gap-1.5">
-          <i data-lucide="user-check" class="w-3.5 h-3.5 text-slate-700"></i> Atendido por:
+        <span class="text-[10px] font-display font-bold uppercase tracking-widest text-slate-500 px-2.5 hidden lg:inline flex items-center gap-1.5">
+          <i data-lucide="user-check" class="w-3.5 h-3.5 text-slate-700"></i> Operador:
         </span>
-        <button id="btn-user-maxi" onclick="setActiveUser('Maximiliano')" class="user-btn px-3.5 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
+        <button id="btn-user-maxi" onclick="setActiveUser('Maximiliano')" class="user-btn px-3 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-slate-900"></span>
           Maximiliano
         </button>
-        <button id="btn-user-romi" onclick="setActiveUser('Romina')" class="user-btn px-3.5 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
+        <button id="btn-user-romi" onclick="setActiveUser('Romina')" class="user-btn px-3 py-1.5 text-xs font-display font-bold rounded-lg transition-all flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-[#E11D48]"></span>
           Romina
         </button>
       </div>
 
       <!-- Quick Action Buttons -->
-      <div class="flex items-center gap-2">
-        <button onclick="openNewManualQuote()" id="btn-nueva-tasacion" title="Tasar vehículo presencial en taller" class="btn-action-primary px-3.5 py-2 rounded-xl text-xs font-display font-extrabold flex items-center gap-1.5 transition shadow-sm active:scale-95">
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button onclick="openNewManualQuote()" id="btn-nueva-tasacion" title="Tasar vehículo presencial en taller" class="btn-action-primary px-3 sm:px-3.5 py-2 rounded-xl text-xs font-display font-extrabold flex items-center gap-1.5 transition shadow-sm active:scale-95">
           <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          <span>+ Nueva Tasación</span>
+          <span>+ Tasar</span>
         </button>
 
-        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar Google Sheets" class="px-3 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
+        <button onclick="syncGoogleSheets()" id="btn-sync" title="Sincronizar todo con Google Sheets" class="px-2.5 sm:px-3 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
           <i data-lucide="refresh-cw" id="icon-sync" class="w-3.5 h-3.5 text-slate-700"></i>
           <span class="hidden md:inline">Sincronizar</span>
         </button>
 
-        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-3 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
+        <button onclick="openTarifarioModal()" title="Configuración de Tarifas" class="px-2.5 sm:px-3 py-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 transition shadow-sm">
           <i data-lucide="calculator" class="w-3.5 h-3.5 text-slate-700"></i>
           <span class="hidden md:inline">Tarifario</span>
         </button>
 
-        <button onclick="openSettingsModal()" title="Ajustes y Conexión" class="p-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 border border-slate-300 rounded-xl text-xs transition shadow-sm">
+        <button onclick="openSettingsModal()" title="Ajustes y Conexión Cloud" class="p-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 border border-slate-300 rounded-xl text-xs transition shadow-sm">
           <i data-lucide="settings" class="w-4 h-4"></i>
         </button>
       </div>
 
     </div>
+
+    <!-- BARRA DE NAVEGACIÓN DE MÓDULOS (Escritorio y Tablet) -->
+    <div class="border-t border-slate-200 bg-slate-50/80 px-4">
+      <div class="max-w-7xl mx-auto flex items-center gap-1.5 overflow-x-auto py-2 no-scrollbar">
+        <button onclick="switchMainTab('tasaciones')" data-main-tab="tasaciones" class="nav-tab active px-3.5 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-2 shrink-0">
+          <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+          <span>Tasaciones & Turnos</span>
+          <span id="nav-badge-tasaciones" class="px-1.5 py-0.5 text-[10px] rounded-full bg-slate-200 text-slate-800 font-mono font-bold">0</span>
+        </button>
+
+        <button onclick="switchMainTab('dashboard')" data-main-tab="dashboard" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-2 shrink-0">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button onclick="switchMainTab('stock')" data-main-tab="stock" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-2 shrink-0">
+          <i data-lucide="package" class="w-4 h-4"></i>
+          <span>Control de Stock</span>
+          <span id="nav-badge-stock" class="hidden px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white font-mono font-extrabold animate-pulse">0</span>
+        </button>
+
+        <button onclick="switchMainTab('gastos')" data-main-tab="gastos" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-2 shrink-0">
+          <i data-lucide="wallet" class="w-4 h-4"></i>
+          <span>Control de Gastos</span>
+        </button>
+
+        <button onclick="switchMainTab('comisiones')" data-main-tab="comisiones" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-2 shrink-0">
+          <i data-lucide="award" class="w-4 h-4"></i>
+          <span>Comisiones (Maxi)</span>
+          <span id="nav-badge-comisiones" class="hidden px-1.5 py-0.5 text-[10px] rounded-full bg-amber-500 text-white font-mono font-extrabold">0</span>
+        </button>
+      </div>
+    </div>
   </header>
+
+  <!-- BANNER DE SINCRONIZACIÓN PENDIENTE / ERROR DE CONEXIÓN -->
+  <div id="sync-error-banner" class="hidden max-w-7xl mx-auto px-4 mt-4">
+    <div class="bg-amber-50 border border-amber-300 rounded-2xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+          <i data-lucide="wifi-off" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <div class="text-xs font-display font-extrabold text-amber-950" id="sync-error-title">Guardado localmente en este dispositivo</div>
+          <div class="text-[11px] font-sans text-amber-800" id="sync-error-desc">No se pudo conectar con Google Sheets. Tus datos están seguros y se sincronizarán apenas vuelva la conexión.</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 self-end sm:self-auto">
+        <button onclick="syncGoogleSheets()" class="px-3 py-1.5 bg-amber-900 text-white rounded-lg text-[11px] font-display font-bold hover:bg-black transition">
+          Reintentar Ahora
+        </button>
+        <button onclick="openSettingsModal()" class="px-3 py-1.5 bg-white border border-amber-300 text-amber-900 rounded-lg text-[11px] font-display font-bold">
+          Configurar Cloud
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- MAIN WRAPPER -->
   <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-    <!-- KPI STATS CARDS (Tarjetas blancas de máxima legibilidad bajo el sol) -->
-    <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
-      
-      <!-- Total Leads -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
-          <i data-lucide="inbox" class="w-5 h-5"></i>
+    <!-- ===================================================================== -->
+    <!-- VISTA 1: TASACIONES Y GESTIÓN DE TURNOS (MÓDULO ORIGINAL INTACTO)     -->
+    <!-- ===================================================================== -->
+    <div id="view-tasaciones" class="space-y-6">
+
+      <!-- KPI STATS CARDS -->
+      <section class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+            <i data-lucide="inbox" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Solicitudes</div>
+            <div id="stat-total" class="font-serif text-2xl font-extrabold text-slate-900 leading-tight">0</div>
+          </div>
         </div>
-        <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Solicitudes</div>
-          <div id="stat-total" class="font-serif text-2xl font-extrabold text-slate-900 leading-tight">0</div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center shrink-0">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Por Cotizar</div>
+            <div id="stat-nuevos" class="font-serif text-2xl font-extrabold text-amber-700 leading-tight">0</div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+            <i data-lucide="send" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Cotizados</div>
+            <div id="stat-cotizados" class="font-serif text-2xl font-extrabold text-slate-900 leading-tight">0</div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0 shadow-sm">
+            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Turnos Agendados</div>
+            <div id="stat-turnos" class="font-serif text-2xl font-extrabold text-emerald-700 leading-tight">0</div>
+          </div>
+        </div>
+
+        <div class="col-span-2 md:col-span-1 bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+          <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+            <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Total Cotizado ($UYU)</div>
+            <div id="stat-monto" class="font-serif text-xl font-extrabold text-slate-900 leading-tight">$0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATUS ALERT / SHEET CONNECTION BANNER -->
+      <div id="sheet-notice-banner" class="hidden bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+            <i data-lucide="info" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-sm font-display font-bold text-slate-900">Conexión con Google Sheets de DetailVlak</div>
+            <div class="text-xs font-sans text-slate-600" id="sheet-status-text">Cargando respuestas de la hoja de cálculo...</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <button onclick="openSettingsModal()" class="text-xs font-display font-bold text-slate-900 underline py-1 px-2">
+            Configurar Sincronización Cloud
+          </button>
         </div>
       </div>
 
-      <!-- Por Cotizar -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center shrink-0">
-          <i data-lucide="clock" class="w-5 h-5"></i>
+      <!-- FILTER & SEARCH CONTROLS -->
+      <section class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="search-input" oninput="renderLeads()" placeholder="Buscar por cliente, auto, teléfono o servicio..." class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs font-sans text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-slate-800 transition">
         </div>
-        <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Por Cotizar</div>
-          <div id="stat-nuevos" class="font-serif text-2xl font-extrabold text-amber-700 leading-tight">0</div>
-        </div>
-      </div>
 
-      <!-- Cotizados -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
-          <i data-lucide="send" class="w-5 h-5"></i>
+        <div class="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          <button onclick="setStatusFilter('ALL')" data-filter="ALL" class="filter-pill active px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Todos</button>
+          <button onclick="setStatusFilter('NUEVO')" data-filter="NUEVO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Por Cotizar</button>
+          <button onclick="setStatusFilter('COTIZADO')" data-filter="COTIZADO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Cotizados</button>
+          <button onclick="setStatusFilter('TURNO')" data-filter="TURNO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Turnos Agendados</button>
+          <button onclick="setStatusFilter('FINALIZADO')" data-filter="FINALIZADO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">✅ Completados</button>
         </div>
-        <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Cotizados</div>
-          <div id="stat-cotizados" class="font-serif text-2xl font-extrabold text-slate-900 leading-tight">0</div>
-        </div>
-      </div>
 
-      <!-- Turnos Confirmados -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0 shadow-sm">
-          <i data-lucide="calendar-check" class="w-5 h-5"></i>
+        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+          <span class="text-[9px] font-display font-extrabold text-slate-500 px-2 uppercase tracking-wider">Ver:</span>
+          <button onclick="setOperatorFilter('ALL')" data-op-filter="ALL" class="op-pill active px-3 py-1 text-xs font-display font-bold rounded-lg">Todos</button>
+          <button onclick="setOperatorFilter('Maximiliano')" data-op-filter="Maximiliano" class="op-pill px-3 py-1 text-xs font-display font-bold rounded-lg">Maxi</button>
+          <button onclick="setOperatorFilter('Romina')" data-op-filter="Romina" class="op-pill px-3 py-1 text-xs font-display font-bold rounded-lg">Romi</button>
         </div>
-        <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Turnos Agendados</div>
-          <div id="stat-turnos" class="font-serif text-2xl font-extrabold text-emerald-700 leading-tight">0</div>
-        </div>
-      </div>
+      </section>
 
-      <!-- Total Tasado ($ UYU) -->
-      <div class="col-span-2 md:col-span-1 bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
-          <i data-lucide="dollar-sign" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <div class="text-[10px] font-display uppercase tracking-widest text-slate-500 font-bold">Total Cotizado ($UYU)</div>
-          <div id="stat-monto" class="font-serif text-xl font-extrabold text-slate-900 leading-tight">$0</div>
-        </div>
-      </div>
+      <!-- LEADS CARDS CONTAINER -->
+      <section>
+        <div id="leads-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-    </section>
+        <div id="empty-state" class="hidden text-center py-16 bg-white border border-slate-200 rounded-2xl shadow-sm">
+          <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-3 border border-slate-200">
+            <i data-lucide="car" class="w-7 h-7"></i>
+          </div>
+          <h3 class="font-serif text-lg font-bold text-slate-900 mb-1">No se encontraron solicitudes</h3>
+          <p class="font-sans text-xs text-slate-500 max-w-sm mx-auto mb-4">Ajustá la búsqueda o sincronizá para recibir las últimas respuestas del Google Form.</p>
+          <button onclick="syncGoogleSheets()" class="btn-action-primary px-5 py-2.5 rounded-xl text-xs font-display font-bold transition inline-flex items-center gap-2 shadow-md">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sincronizar Ahora
+          </button>
+        </div>
+      </section>
 
-    <!-- STATUS ALERT / SHEET CONNECTION BANNER -->
-    <div id="sheet-notice-banner" class="hidden bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
-          <i data-lucide="info" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <div class="text-sm font-display font-bold text-slate-900">Conexión con Google Sheets de DetailVlak</div>
-          <div class="text-xs font-sans text-slate-600" id="sheet-status-text">Cargando respuestas de la hoja de cálculo...</div>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 self-end sm:self-auto">
-        <button onclick="openSheetGuideModal()" class="text-xs font-display font-bold text-slate-900 underline py-1 px-2">
-          ¿Cómo autorizar la hoja?
-        </button>
-        <button onclick="loadSampleData()" class="btn-action-primary text-xs font-display font-bold rounded-lg px-3.5 py-1.5 transition">
-          Cargar Ejemplos
-        </button>
-      </div>
     </div>
 
-    <!-- FILTER & SEARCH CONTROLS -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-      
-      <!-- Search Input -->
-      <div class="relative flex-1">
-        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-        <input type="text" id="search-input" oninput="renderLeads()" placeholder="Buscar por cliente, auto, teléfono o servicio..." class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs font-sans text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-slate-800 transition">
-      </div>
+    <!-- ===================================================================== -->
+    <!-- VISTA 2: DASHBOARD FINANCIERO & OPERATIVO AMPLIADO                    -->
+    <!-- ===================================================================== -->
+    <div id="view-dashboard" class="hidden space-y-6">
 
-      <!-- Filter by Status Pills -->
-      <div class="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-        <button onclick="setStatusFilter('ALL')" data-filter="ALL" class="filter-pill active px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Todos</button>
-        <button onclick="setStatusFilter('NUEVO')" data-filter="NUEVO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Por Cotizar</button>
-        <button onclick="setStatusFilter('COTIZADO')" data-filter="COTIZADO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Cotizados</button>
-        <button onclick="setStatusFilter('TURNO')" data-filter="TURNO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Turnos Agendados</button>
-        <button onclick="setStatusFilter('FINALIZADO')" data-filter="FINALIZADO" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-display font-bold">Finalizados</button>
-      </div>
-
-      <!-- Filter by Operator -->
-      <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
-        <span class="text-[9px] font-display font-extrabold text-slate-500 px-2 uppercase tracking-wider">Ver:</span>
-        <button onclick="setOperatorFilter('ALL')" data-op-filter="ALL" class="op-pill active px-3 py-1 text-xs font-display font-bold rounded-lg">Todos</button>
-        <button onclick="setOperatorFilter('Maximiliano')" data-op-filter="Maximiliano" class="op-pill px-3 py-1 text-xs font-display font-bold rounded-lg">Maxi</button>
-        <button onclick="setOperatorFilter('Romina')" data-op-filter="Romina" class="op-pill px-3 py-1 text-xs font-display font-bold rounded-lg">Romi</button>
-      </div>
-
-    </section>
-
-    <!-- LEADS CARDS CONTAINER -->
-    <section>
-      <div id="leads-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Dynamic Cards Rendered by JS -->
-      </div>
-
-      <!-- Empty State -->
-      <div id="empty-state" class="hidden text-center py-16 bg-white border border-slate-200 rounded-2xl shadow-sm">
-        <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-3 border border-slate-200">
-          <i data-lucide="car" class="w-7 h-7"></i>
+      <!-- Encabezado de Dashboard con Filtro de Mes -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="font-serif text-xl font-extrabold text-slate-900 flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+            Balance Financiero & Rendimiento DetailVlak
+          </h2>
+          <p class="text-xs text-slate-500">Ingresos reales (trabajos completados), gastos operativos, comisiones y resultado neto</p>
         </div>
-        <h3 class="font-serif text-lg font-bold text-slate-900 mb-1">No se encontraron solicitudes</h3>
-        <p class="font-sans text-xs text-slate-500 max-w-sm mx-auto mb-4">Ajustá la búsqueda o sincronizá para recibir las últimas respuestas del Google Form.</p>
-        <button onclick="syncGoogleSheets()" class="btn-action-primary px-5 py-2.5 rounded-xl text-xs font-display font-bold transition inline-flex items-center gap-2 shadow-md">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sincronizar Ahora
-        </button>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <label class="text-[10px] font-display font-extrabold uppercase tracking-wider text-slate-500 shrink-0">Período:</label>
+          <select id="dashboard-month-filter" onchange="renderDashboard()" class="flex-1 sm:w-48 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-display font-bold text-slate-900 focus:bg-white focus:outline-none">
+            <!-- Opciones generadas dinámicamente -->
+          </select>
+        </div>
       </div>
-    </section>
+
+      <!-- 4 TARJETAS FINANCIERAS PRINCIPALES -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Ingresos del Mes -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">Ingresos del Mes</span>
+            <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div id="dash-income" class="font-serif text-2xl sm:text-3xl font-black text-slate-900">$0</div>
+          <div id="dash-income-sub" class="text-[11px] font-sans text-slate-500 mt-1">0 trabajos completados</div>
+        </div>
+
+        <!-- Gastos del Mes -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">Gastos del Mes</span>
+            <span class="w-8 h-8 rounded-xl bg-red-50 text-red-700 border border-red-200 flex items-center justify-center">
+              <i data-lucide="trending-down" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div id="dash-expenses" class="font-serif text-2xl sm:text-3xl font-black text-slate-900">$0</div>
+          <div id="dash-expenses-sub" class="text-[11px] font-sans text-slate-500 mt-1">0 comprobantes registrados</div>
+        </div>
+
+        <!-- Comisiones del Mes -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">Comisiones (Maxi)</span>
+            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center">
+              <i data-lucide="award" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div id="dash-commissions" class="font-serif text-2xl sm:text-3xl font-black text-slate-900">$0</div>
+          <div id="dash-commissions-sub" class="text-[11px] font-sans text-slate-500 mt-1">Pendientes: $0</div>
+        </div>
+
+        <!-- Resultado Neto = Ingresos - Gastos - Comisiones -->
+        <div class="highlight-box rounded-2xl p-5 shadow-sm border-2 border-slate-900">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-700">Resultado Neto</span>
+            <span class="brand-badge px-2 py-0.5 rounded-md text-[9px] font-display font-extrabold uppercase">Caja Libre</span>
+          </div>
+          <div id="dash-net" class="font-serif text-2xl sm:text-3xl font-black text-slate-900">$0</div>
+          <div class="text-[10px] font-mono text-slate-600 mt-1">Ingresos – Gastos – Comisiones</div>
+        </div>
+
+      </div>
+
+      <!-- MÉTRICAS OPERATIVAS SECUNDARIAS -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-400">Trabajos Completados</div>
+          <div id="dash-jobs-count" class="font-serif text-2xl font-extrabold text-slate-900 mt-0.5">0</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-400">Ticket Promedio</div>
+          <div id="dash-avg-ticket" class="font-serif text-2xl font-extrabold text-slate-900 mt-0.5">$0</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-400">Valor en Inventario</div>
+          <div id="dash-stock-value" class="font-serif text-2xl font-extrabold text-slate-900 mt-0.5">$0</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-bold uppercase tracking-wider text-slate-400">Ítems en Stock Bajo</div>
+          <div id="dash-low-stock-count" class="font-serif text-2xl font-extrabold text-red-600 mt-0.5">0</div>
+        </div>
+      </div>
+
+      <!-- GRÁFICO DE 6 MESES + SERVICIOS MÁS VENDIDOS -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        
+        <!-- Gráfico Ingresos vs Gastos últimos 6 meses -->
+        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="font-serif text-base font-bold text-slate-900">Ingresos vs. Egresos (Últimos 6 Meses)</h3>
+              <p class="text-[11px] text-slate-500">Comparativa mensual en $UYU (Egresos incluye Gastos + Comisiones)</p>
+            </div>
+            <div class="flex items-center gap-3 text-[11px] font-display font-bold">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block chart-bar-income"></span> Ingresos</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block chart-bar-expense"></span> Gastos + Comis.</span>
+            </div>
+          </div>
+
+          <div id="dash-chart-6m" class="h-56 flex items-end justify-between gap-2 sm:gap-4 pt-6 pb-2 px-2 border-b border-slate-200">
+            <!-- Barras generadas por JS -->
+          </div>
+        </div>
+
+        <!-- Servicios Más Vendidos del Mes -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col">
+          <div class="mb-3">
+            <h3 class="font-serif text-base font-bold text-slate-900">Servicios Más Vendidos</h3>
+            <p class="text-[11px] text-slate-500">Ranking en trabajos completados del período</p>
+          </div>
+          <div id="dash-top-services" class="space-y-3 flex-1">
+            <!-- Ranking generado por JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PRODUCTOS CON STOCK BAJO (ACCESO DIRECTO) -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            </span>
+            <div>
+              <h3 class="font-serif text-base font-bold text-slate-900">Alertas de Reposición de Stock</h3>
+              <p class="text-[11px] text-slate-500">Productos actualmente en o por debajo del stock mínimo configurado</p>
+            </div>
+          </div>
+          <button onclick="switchMainTab('stock')" class="btn-action-primary px-3.5 py-2 rounded-xl text-xs font-display font-bold inline-flex items-center gap-1.5 self-start sm:self-auto">
+            <i data-lucide="package" class="w-3.5 h-3.5"></i>
+            <span>Ir a Control de Stock</span>
+          </button>
+        </div>
+
+        <div id="dash-low-stock-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <!-- Lista corta de stock bajo -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 3: CONTROL DE STOCK (100% MANUAL + HISTORIAL DE MOVIMIENTOS)    -->
+    <!-- ===================================================================== -->
+    <div id="view-stock" class="hidden space-y-6">
+
+      <!-- Resumen de Inventario -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="highlight-box rounded-2xl p-4 border border-slate-200 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">Valor Total del Inventario</div>
+            <div id="stock-total-value" class="font-serif text-2xl sm:text-3xl font-black text-slate-900 mt-0.5">$0</div>
+            <div class="text-[10px] font-sans text-slate-500">Suma de (Cantidad × Costo Unitario)</div>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="boxes" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">Productos Registrados</div>
+            <div id="stock-total-items" class="font-serif text-2xl sm:text-3xl font-black text-slate-900 mt-0.5">0</div>
+            <div class="text-[10px] font-sans text-slate-500">Control 100% manual</div>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+            <i data-lucide="package-check" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-red-600">En Alerta (Stock Bajo)</div>
+            <div id="stock-alert-count" class="font-serif text-2xl sm:text-3xl font-black text-red-600 mt-0.5">0</div>
+            <div class="text-[10px] font-sans text-slate-500">En o debajo del mínimo</div>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center shrink-0">
+            <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Acciones, Buscador y Filtro por Categoría -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="stock-search-input" oninput="renderStock()" placeholder="Buscar producto por nombre o proveedor..." class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs font-sans text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-slate-800">
+          </div>
+
+          <button onclick="openStockProductModal()" class="btn-action-primary px-4 py-2.5 rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-2 shadow-sm active:scale-95 shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>+ Alta de Producto</span>
+          </button>
+        </div>
+
+        <!-- Filtros de Categoría de Stock -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <button onclick="setStockCategoryFilter('ALL')" data-stock-cat="ALL" class="stock-cat-pill filter-pill active px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Todos</button>
+          <button onclick="setStockCategoryFilter('LOW')" data-stock-cat="LOW" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0 text-red-700">⚠️ Stock Bajo</button>
+          <button onclick="setStockCategoryFilter('Químicos')" data-stock-cat="Químicos" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Químicos</button>
+          <button onclick="setStockCategoryFilter('Paños/Microfibras')" data-stock-cat="Paños/Microfibras" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Paños/Microfibras</button>
+          <button onclick="setStockCategoryFilter('Pads')" data-stock-cat="Pads" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Pads</button>
+          <button onclick="setStockCategoryFilter('Herramientas')" data-stock-cat="Herramientas" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Herramientas</button>
+          <button onclick="setStockCategoryFilter('Accesorios')" data-stock-cat="Accesorios" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Accesorios</button>
+          <button onclick="setStockCategoryFilter('Otros')" data-stock-cat="Otros" class="stock-cat-pill filter-pill px-3 py-1.5 rounded-lg text-xs font-display font-bold shrink-0">Otros</button>
+        </div>
+      </div>
+
+      <!-- Grilla de Productos de Stock -->
+      <div id="stock-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Renderizado por JS -->
+      </div>
+
+      <!-- Historial de Movimientos de Stock -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-serif text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4"></i>
+              Historial de Movimientos de Stock
+            </h3>
+            <p class="text-[11px] text-slate-500">Registro auditable de entradas y salidas con fecha, cantidad y operador</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-[10px] font-display font-extrabold uppercase tracking-wider border-b border-slate-200">
+                <th class="py-2.5 px-3">Fecha</th>
+                <th class="py-2.5 px-3">Producto</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Cantidad</th>
+                <th class="py-2.5 px-3">Operador</th>
+                <th class="py-2.5 px-3">Nota</th>
+              </tr>
+            </thead>
+            <tbody id="stock-movements-tbody" class="divide-y divide-slate-200 font-sans">
+              <!-- Renderizado por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 4: CONTROL DE GASTOS (CARGA RÁPIDA EN <10 SEGUNDOS)             -->
+    <!-- ===================================================================== -->
+    <div id="view-gastos" class="hidden space-y-6">
+
+      <!-- Tarjeta de Carga Rápida de Gasto (<10 seg en celular) -->
+      <div class="bg-white border-2 border-slate-900 rounded-2xl p-5 shadow-md">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="brand-logo-box w-8 h-8 rounded-xl flex items-center justify-center">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+            </span>
+            <div>
+              <h3 class="font-serif text-base font-bold text-slate-900">Carga Rápida de Gasto</h3>
+              <p class="text-[11px] text-slate-500">Registrá un egreso del taller en segundos ($UYU)</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+            Registra: <strong id="quick-expense-operator-label">Maximiliano</strong>
+          </span>
+        </div>
+
+        <form id="quick-expense-form" onsubmit="handleQuickExpenseSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Fecha</label>
+            <input type="date" id="exp-date" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900">
+          </div>
+
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Monto ($ UYU)</label>
+            <input type="number" id="exp-amount" step="1" min="1" required placeholder="$ Ej: 1500" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-extrabold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900">
+          </div>
+
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Categoría</label>
+            <select id="exp-category" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-display font-bold text-slate-900 focus:bg-white focus:outline-none">
+              <option value="Insumos">🧪 Insumos</option>
+              <option value="Alquiler">🏢 Alquiler</option>
+              <option value="Sueldos">👥 Sueldos</option>
+              <option value="Servicios/Luz/Agua">💡 Servicios / Luz / Agua</option>
+              <option value="Publicidad">📢 Publicidad</option>
+              <option value="Herramientas">🛠️ Herramientas</option>
+              <option value="Otros">📌 Otros</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Medio de Pago</label>
+            <select id="exp-payment" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-display font-bold text-slate-900 focus:bg-white focus:outline-none">
+              <option value="Efectivo">💵 Efectivo</option>
+              <option value="Transferencia">🏦 Transferencia</option>
+              <option value="Tarjeta">💳 Tarjeta</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2 lg:col-span-1">
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Descripción</label>
+            <input type="text" id="exp-desc" required placeholder="Ej: Bidón Shampoo / UTE" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-sans text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900">
+          </div>
+
+          <div class="sm:col-span-2 lg:col-span-1 flex items-end">
+            <button type="submit" class="w-full btn-action-primary py-2.5 px-4 rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>Guardar Gasto</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Filtros de Gastos y Resumen del Período -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Filtrar Mes</label>
+            <select id="exp-filter-month" onchange="renderExpenses()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-display font-bold text-slate-900 focus:outline-none">
+              <!-- Dinámico -->
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Filtrar Categoría</label>
+            <select id="exp-filter-category" onchange="renderExpenses()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-display font-bold text-slate-900 focus:outline-none">
+              <option value="ALL">Todas las categorías</option>
+              <option value="Insumos">Insumos</option>
+              <option value="Alquiler">Alquiler</option>
+              <option value="Sueldos">Sueldos</option>
+              <option value="Servicios/Luz/Agua">Servicios/Luz/Agua</option>
+              <option value="Publicidad">Publicidad</option>
+              <option value="Herramientas">Herramientas</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="highlight-box rounded-xl px-4 py-3 border border-slate-200 flex items-center justify-between gap-6">
+          <div>
+            <div class="text-[10px] font-display font-extrabold uppercase tracking-wider text-slate-500">Total Gastos del Período</div>
+            <div id="exp-period-count" class="text-[11px] text-slate-500">0 registros</div>
+          </div>
+          <div id="exp-period-total" class="font-serif text-2xl font-black text-slate-900">$0</div>
+        </div>
+      </div>
+
+      <!-- Listado de Gastos -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-[10px] font-display font-extrabold uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4">Fecha</th>
+                <th class="py-3 px-4">Categoría</th>
+                <th class="py-3 px-4">Descripción</th>
+                <th class="py-3 px-4">Medio de Pago</th>
+                <th class="py-3 px-4">Operador</th>
+                <th class="py-3 px-4 text-right">Monto ($UYU)</th>
+                <th class="py-3 px-4 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="expenses-tbody" class="divide-y divide-slate-200">
+              <!-- Renderizado por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 5: COMISIONES DE MAXIMILIANO                                    -->
+    <!-- ===================================================================== -->
+    <div id="view-comisiones" class="hidden space-y-6">
+
+      <!-- Encabezado y Regla de Comisión -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-start gap-3">
+          <div class="brand-logo-box w-10 h-10 rounded-2xl flex items-center justify-center shrink-0">
+            <i data-lucide="award" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="font-serif text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              Liquidación de Comisiones • Maximiliano
+              <span id="comm-rate-badge" class="brand-badge text-[10px] font-mono px-2 py-0.5 rounded-full">30%</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Se genera automáticamente cuando un trabajo con <strong>Atendido Por = Maximiliano</strong> pasa a estado <strong>✅ Trabajo Completado</strong>. Si vuelve atrás o se cancela, se elimina.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <select id="comm-filter-month" onchange="renderCommissions()" class="flex-1 md:w-44 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-display font-bold text-slate-900 focus:outline-none">
+            <!-- Dinámico -->
+          </select>
+          <button onclick="payAllPendingCommissions()" class="btn-action-primary px-3.5 py-2 rounded-xl text-xs font-display font-bold shrink-0 transition active:scale-95">
+            Marcar Mes Pagado
+          </button>
+        </div>
+      </div>
+
+      <!-- 3 KPI Cards de Comisiones -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">Total Comisiones del Mes</div>
+          <div id="comm-total-month" class="font-serif text-2xl sm:text-3xl font-black text-slate-900 mt-1">$0</div>
+          <div id="comm-jobs-count" class="text-[11px] text-slate-500 mt-0.5">0 trabajos completados por Maxi</div>
+        </div>
+
+        <div class="bg-white border border-emerald-200 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-emerald-700">Comisiones Pagadas</div>
+          <div id="comm-total-paid" class="font-serif text-2xl sm:text-3xl font-black text-emerald-700 mt-1">$0</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Liquidadas</div>
+        </div>
+
+        <div class="bg-white border border-amber-300 rounded-2xl p-4 shadow-sm">
+          <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-amber-800">Comisiones Pendientes</div>
+          <div id="comm-total-pending" class="font-serif text-2xl sm:text-3xl font-black text-amber-700 mt-1">$0</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Saldo por abonar a Maximiliano</div>
+        </div>
+      </div>
+
+      <!-- Tabla de Comisiones -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-[10px] font-display font-extrabold uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4">Fecha</th>
+                <th class="py-3 px-4">Cliente</th>
+                <th class="py-3 px-4">Vehículo</th>
+                <th class="py-3 px-4 text-right">Total Trabajo ($UYU)</th>
+                <th class="py-3 px-4 text-right">Comisión (<span id="comm-th-rate">30</span>%)</th>
+                <th class="py-3 px-4 text-center">Estado</th>
+                <th class="py-3 px-4 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="commissions-tbody" class="divide-y divide-slate-200">
+              <!-- Renderizado por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
 
   </main>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA PARA CELULAR (iPhone First) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex items-center justify-around shadow-lg">
+    <button onclick="switchMainTab('tasaciones')" data-mobile-tab="tasaciones" class="mobile-nav-btn active flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl">
+      <div class="mobile-nav-pill px-2.5 py-0.5 rounded-full flex items-center justify-center">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+      </div>
+      <span class="text-[10px] font-display">Tasaciones</span>
+    </button>
+
+    <button onclick="switchMainTab('dashboard')" data-mobile-tab="dashboard" class="mobile-nav-btn flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl">
+      <div class="mobile-nav-pill px-2.5 py-0.5 rounded-full flex items-center justify-center">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+      </div>
+      <span class="text-[10px] font-display">Dashboard</span>
+    </button>
+
+    <button onclick="switchMainTab('stock')" data-mobile-tab="stock" class="mobile-nav-btn relative flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl">
+      <div class="mobile-nav-pill px-2.5 py-0.5 rounded-full flex items-center justify-center">
+        <i data-lucide="package" class="w-4 h-4"></i>
+      </div>
+      <span class="text-[10px] font-display">Stock</span>
+      <span id="mobile-badge-stock" class="hidden absolute top-0.5 right-2 w-2 h-2 rounded-full bg-red-600"></span>
+    </button>
+
+    <button onclick="switchMainTab('gastos')" data-mobile-tab="gastos" class="mobile-nav-btn flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl">
+      <div class="mobile-nav-pill px-2.5 py-0.5 rounded-full flex items-center justify-center">
+        <i data-lucide="wallet" class="w-4 h-4"></i>
+      </div>
+      <span class="text-[10px] font-display">Gastos</span>
+    </button>
+
+    <button onclick="switchMainTab('comisiones')" data-mobile-tab="comisiones" class="mobile-nav-btn flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl">
+      <div class="mobile-nav-pill px-2.5 py-0.5 rounded-full flex items-center justify-center">
+        <i data-lucide="award" class="w-4 h-4"></i>
+      </div>
+      <span class="text-[10px] font-display">Comisiones</span>
+    </button>
+  </nav>
 
   <!-- ==================== MODAL DE COTIZACIÓN & WHATSAPP ==================== -->
   <div id="modal-cotizador" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
@@ -279,7 +829,6 @@
       <!-- Modal Body (Scrollable) -->
       <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-700 bg-white">
         
-        <!-- Cliente & Vehículo Info Banner (Campos Editables para Tasación en Taller o Form) -->
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5 shadow-sm">
           <div>
             <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Nombre del Cliente</label>
@@ -330,7 +879,6 @@
             </select>
           </div>
 
-          <!-- Observaciones del cliente / estado del auto -->
           <div class="sm:col-span-3">
             <label class="text-[9px] font-display uppercase tracking-widest text-slate-500 font-extrabold block mb-1">Detalles / Estado del auto o Zonas a Priorizar</label>
             <input type="text" id="modal-lead-notes-input" oninput="onLeadDataInput()" placeholder="Ej: Mancha de café en asiento trasero, ópticas opacas, pintura con marcas de lavado..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-800">
@@ -347,10 +895,7 @@
             <span class="text-[11px] font-sans text-slate-500">Tildá o destildá para sumar al presupuesto</span>
           </div>
 
-          <!-- Checkboxes de Servicios con Precios Dinámicos -->
-          <div id="modal-services-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <!-- Renderizado dinámico de servicios -->
-          </div>
+          <div id="modal-services-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
         </div>
 
         <!-- SECCIÓN 2: AJUSTES (DESCUENTOS / RECARGOS / TIEMPO) -->
@@ -379,7 +924,7 @@
           </div>
         </div>
 
-        <!-- TOTAL DESTACADO (Alto impacto visual) -->
+        <!-- TOTAL DESTACADO -->
         <div class="highlight-box rounded-2xl p-5 flex items-center justify-between shadow-sm transition-all">
           <div>
             <div class="text-[10px] font-display font-extrabold uppercase tracking-widest text-slate-500">TOTAL TASACIÓN DETAILVLAK</div>
@@ -401,7 +946,6 @@
             <span class="text-[11px] font-sans text-slate-500">Elegí la plantilla y editala libremente</span>
           </div>
 
-          <!-- Selector de Plantilla Tabs -->
           <div class="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
             <button onclick="setMsgTemplate('formal')" data-template-btn="formal" class="template-tab active px-3 py-1.5 text-xs font-display font-bold rounded-lg">✨ Formal Detallada</button>
             <button onclick="setMsgTemplate('promo')" data-template-btn="promo" class="template-tab px-3 py-1.5 text-xs font-display font-bold rounded-lg">🎁 Promo Combo</button>
@@ -410,7 +954,6 @@
             <button onclick="setMsgTemplate('turno')" data-template-btn="turno" class="template-tab px-3 py-1.5 text-xs font-display font-bold rounded-lg">🗓️ Confirmar Turno</button>
           </div>
 
-          <!-- Cuadro de Texto Previsualizable y Editable -->
           <div class="relative">
             <textarea id="modal-whatsapp-preview" rows="7" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:border-slate-800 leading-relaxed"></textarea>
             <button onclick="copyWhatsAppMessage()" class="absolute right-3 top-3 px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-800 rounded-lg text-[10px] font-display font-bold flex items-center gap-1.5 border border-slate-300 shadow-sm transition" title="Copiar texto">
@@ -436,11 +979,14 @@
         </div>
 
         <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+          <button onclick="confirmDeleteLead()" id="btn-delete-lead" class="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-xs font-display font-bold transition" title="Eliminar tasación">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+
           <button onclick="saveLeadQuoteOnly()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-xl text-xs font-display font-bold transition shadow-sm">
             Guardar
           </button>
 
-          <!-- BOTÓN PRINCIPAL WHATSAPP (Dinámico con el tema del operador) -->
           <button onclick="sendViaWhatsApp()" class="btn-action-primary flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-2 transition active:scale-95">
             <i data-lucide="send" class="w-4 h-4"></i>
             <span>Enviar por WhatsApp</span>
@@ -448,6 +994,200 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ==================== MODAL ALTA / EDICIÓN DE PRODUCTO DE STOCK ==================== -->
+  <div id="modal-stock-product" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden my-auto animate-in">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h3 id="stock-product-modal-title" class="font-serif text-lg font-bold text-slate-900">Alta de Producto en Stock</h3>
+        <button onclick="closeStockProductModal()" class="text-slate-500 hover:text-slate-900 p-1.5 rounded-xl bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="saveStockProduct(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="stock-item-id">
+
+        <div>
+          <label class="block font-display font-bold text-slate-800 mb-1">Nombre del Producto *</label>
+          <input type="text" id="stock-item-name" required placeholder="Ej: APC Koch Chemie Green Star / Microfibra 40x40" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Categoría *</label>
+            <select id="stock-item-category" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none">
+              <option value="Químicos">Químicos</option>
+              <option value="Paños/Microfibras">Paños/Microfibras</option>
+              <option value="Pads">Pads</option>
+              <option value="Herramientas">Herramientas</option>
+              <option value="Accesorios">Accesorios</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Unidad de Medida *</label>
+            <select id="stock-item-unit" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none">
+              <option value="litros">Litros (L)</option>
+              <option value="unidades">Unidades (u.)</option>
+              <option value="kg">Kilogramos (kg)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Cantidad Actual *</label>
+            <input type="number" id="stock-item-qty" step="0.1" min="0" required placeholder="0" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Stock Mínimo *</label>
+            <input type="number" id="stock-item-min" step="0.1" min="0" required placeholder="1" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Costo Unit. ($UYU)</label>
+            <input type="number" id="stock-item-cost" step="1" min="0" required placeholder="$0" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-display font-bold text-slate-800 mb-1">Proveedor (Opcional)</label>
+          <input type="text" id="stock-item-supplier" placeholder="Ej: Detailing Store Uruguay / Importador" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none">
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
+          <button type="button" onclick="closeStockProductModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-display font-bold">Cancelar</button>
+          <button type="submit" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold">Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL RÁPIDO DE MOVIMIENTO (+ ENTRADA / - SALIDA) ==================== -->
+  <div id="modal-stock-movement" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden my-auto animate-in">
+      <div id="stock-move-header" class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h3 id="stock-move-title" class="font-serif text-lg font-bold text-slate-900">+ Entrada de Stock</h3>
+          <p id="stock-move-subtitle" class="text-xs font-display font-bold text-slate-500">Producto</p>
+        </div>
+        <button onclick="closeStockMovementModal()" class="text-slate-500 hover:text-slate-900 p-1.5 rounded-xl bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="submitStockMovement(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="stock-move-product-id">
+        <input type="hidden" id="stock-move-type">
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-display font-bold text-slate-800">Cantidad a registrar (<span id="stock-move-unit-label">unidades</span>) *</label>
+            <span class="text-[11px] font-mono text-slate-500">Actual: <strong id="stock-move-current-qty">0</strong></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="number" id="stock-move-qty" step="0.1" min="0.1" required oninput="updateStockMoveCostPreview()" class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-base font-mono font-black text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900">
+            <button type="button" onclick="adjustMoveQty(1)" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-mono font-bold text-slate-800">+1</button>
+            <button type="button" onclick="adjustMoveQty(5)" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-mono font-bold text-slate-800">+5</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-display font-bold text-slate-800 mb-1">Nota / Motivo (Opcional)</label>
+          <input type="text" id="stock-move-note" placeholder="Ej: Reposición mensual / Uso en taller" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none">
+        </div>
+
+        <!-- Opción automática para cargar como Gasto en categoría Insumos cuando es + Entrada -->
+        <div id="stock-move-expense-box" class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-3.5 space-y-2.5">
+          <label class="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" id="stock-move-also-expense" onchange="toggleMoveExpenseMethod()" class="mt-0.5 w-4 h-4 rounded">
+            <div>
+              <span class="font-display font-bold text-slate-900 block">Cargar también como Gasto en "Insumos"</span>
+              <span id="stock-move-expense-preview" class="text-[11px] font-mono text-emerald-800 font-bold">Costo calculado: $0 UYU</span>
+            </div>
+          </label>
+
+          <div id="stock-move-payment-wrap" class="hidden pt-1">
+            <label class="text-[10px] font-display font-bold uppercase text-slate-600 block mb-1">Medio de Pago de la Compra</label>
+            <select id="stock-move-payment" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-display font-bold text-slate-900">
+              <option value="Efectivo">💵 Efectivo</option>
+              <option value="Transferencia">🏦 Transferencia</option>
+              <option value="Tarjeta">💳 Tarjeta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex justify-end gap-2">
+          <button type="button" onclick="closeStockMovementModal()" class="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-display font-bold">Cancelar</button>
+          <button type="submit" class="btn-action-primary px-5 py-2.5 rounded-xl font-display font-extrabold">Confirmar Movimiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL EDITAR GASTO ==================== -->
+  <div id="modal-expense-edit" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden my-auto animate-in">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-serif text-lg font-bold text-slate-900">Editar Gasto</h3>
+        <button onclick="closeExpenseEditModal()" class="text-slate-500 hover:text-slate-900 p-1.5 rounded-xl bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="saveEditedExpense(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="edit-exp-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Fecha *</label>
+            <input type="date" id="edit-exp-date" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold text-slate-900">
+          </div>
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Monto ($ UYU) *</label>
+            <input type="number" id="edit-exp-amount" step="1" min="1" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono font-extrabold text-slate-900">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Categoría *</label>
+            <select id="edit-exp-category" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-display font-bold text-slate-900">
+              <option value="Insumos">Insumos</option>
+              <option value="Alquiler">Alquiler</option>
+              <option value="Sueldos">Sueldos</option>
+              <option value="Servicios/Luz/Agua">Servicios/Luz/Agua</option>
+              <option value="Publicidad">Publicidad</option>
+              <option value="Herramientas">Herramientas</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-display font-bold text-slate-800 mb-1">Medio de Pago *</label>
+            <select id="edit-exp-payment" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-display font-bold text-slate-900">
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Tarjeta">Tarjeta</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-display font-bold text-slate-800 mb-1">Descripción *</label>
+          <input type="text" id="edit-exp-desc" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900">
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex justify-end gap-2">
+          <button type="button" onclick="closeExpenseEditModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-display font-bold">Cancelar</button>
+          <button type="submit" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold">Guardar Cambios</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -472,10 +1212,9 @@
 
       <div class="p-6 overflow-y-auto space-y-4 text-xs font-sans bg-white">
         <p class="text-slate-600">
-          Estos valores se usan como base para calcular automáticamente los presupuestos cuando los clientes llenan el Google Form. Podés ajustarlos en cualquier momento.
+          Estos valores se usan como base para calcular automáticamente los presupuestos. Al guardar, se sincronizan con Google Sheets para todos los dispositivos.
         </p>
 
-        <!-- Tabla Responsive de Tarifas -->
         <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm">
           <table class="w-full text-left border-collapse bg-white">
             <thead>
@@ -488,9 +1227,7 @@
                 <th class="py-3 px-2 text-center">Moto</th>
               </tr>
             </thead>
-            <tbody id="tarifario-table-body" class="divide-y divide-slate-200 font-medium">
-              <!-- Renderizado por JS -->
-            </tbody>
+            <tbody id="tarifario-table-body" class="divide-y divide-slate-200 font-medium"></tbody>
           </table>
         </div>
 
@@ -508,7 +1245,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL DE CONFIGURACIÓN & NEGOCIO ==================== -->
+  <!-- ==================== MODAL DE CONFIGURACIÓN, COMISIONES & CLOUD SYNC ==================== -->
   <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
     <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
       
@@ -518,8 +1255,8 @@
             <i data-lucide="settings" class="w-5 h-5"></i>
           </div>
           <div>
-            <h2 class="font-serif text-xl font-bold text-slate-900">Configuración del Taller</h2>
-            <p class="font-sans text-xs text-slate-500">Datos de DetailVlak y vinculación con Google Sheets</p>
+            <h2 class="font-serif text-xl font-bold text-slate-900">Configuración & Persistencia Cloud</h2>
+            <p class="font-sans text-xs text-slate-500">Sincronización multi-dispositivo en Google Sheets y parámetros del taller</p>
           </div>
         </div>
         <button onclick="closeModalSettings()" class="text-slate-500 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200">
@@ -529,13 +1266,34 @@
 
       <div class="p-6 overflow-y-auto space-y-4 text-xs font-sans bg-white">
         
+        <!-- URL Web App Google Apps Script -->
+        <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-slate-900 font-display font-extrabold text-xs uppercase tracking-wider">
+              ☁️ URL de Web App (Google Apps Script)
+            </label>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold">Recomendado</span>
+          </div>
+          <input type="text" id="setting-script-url" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 focus:outline-none focus:border-slate-900" placeholder="https://script.google.com/macros/s/.../exec">
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Sincroniza automáticamente <strong>Tasaciones, Tarifario, Stock, MovimientosStock, Gastos y Comisiones</strong> entre los celulares de Maximiliano y Romina sin necesidad de que la planilla sea pública.
+          </p>
+          <div class="pt-1 flex flex-wrap items-center gap-2">
+            <button type="button" onclick="copyAppsScriptCode()" class="px-3 py-1.5 bg-slate-900 text-white rounded-lg font-display font-bold text-[11px] inline-flex items-center gap-1.5 hover:bg-slate-800 transition">
+              <i data-lucide="code" class="w-3.5 h-3.5"></i>
+              <span id="btn-copy-gas-text">Copiar Código Google Apps Script</span>
+            </button>
+            <span class="text-[11px] text-slate-500">Pegalo en <em>Extensiones &gt; Apps Script</em> de tu Google Sheet y publicalo como Aplicación Web.</span>
+          </div>
+        </div>
+
+        <!-- Enlace de la Hoja de Cálculo -->
         <div>
           <label class="block text-slate-900 font-display font-bold mb-1">Enlace de la Hoja de Cálculo de Google Forms</label>
           <input type="text" id="setting-sheet-url" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 focus:bg-white focus:outline-none" placeholder="https://docs.google.com/spreadsheets/d/...">
-          <p class="text-[11px] text-slate-500 mt-1">La hoja vinculada a las respuestas del formulario de DetailVlak.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           <div>
             <label class="block text-slate-900 font-display font-bold mb-1">Nombre del Taller</label>
             <input type="text" id="setting-shop-name" value="DetailVlak" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-sans text-slate-900 focus:bg-white focus:outline-none">
@@ -544,30 +1302,23 @@
             <label class="block text-slate-900 font-display font-bold mb-1">Ubicación / Dirección</label>
             <input type="text" id="setting-shop-address" value="Av. Giannattasio y, 15000 Shangrilá, Canelones" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-sans text-slate-900 focus:bg-white focus:outline-none">
           </div>
-        </div>
-
-        <!-- Guía de conexión rápida -->
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-          <div class="font-display font-bold text-slate-900 flex items-center gap-2 text-xs uppercase tracking-wider">
-            <i data-lucide="key" class="w-4 h-4 text-slate-900"></i>
-            ¿Cómo autorizar la hoja para sincronización automática?
+          <div>
+            <label class="block text-slate-900 font-display font-bold mb-1">% Comisión Maximiliano</label>
+            <div class="relative">
+              <input type="number" id="setting-commission-rate" min="0" max="100" step="1" value="30" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-black text-slate-900 focus:bg-white focus:outline-none">
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 font-mono font-bold text-slate-500">%</span>
+            </div>
           </div>
-          <ol class="list-decimal list-inside space-y-1 text-slate-600 text-[11px] leading-relaxed">
-            <li>Abrí tu Google Sheet en el navegador.</li>
-            <li>Tocá el botón verde <strong class="text-slate-900">"Compartir"</strong> arriba a la derecha.</li>
-            <li>En <strong class="text-slate-900">"Acceso general"</strong>, cambiá de <em>Restringido</em> a <strong class="text-slate-900">"Cualquier persona que tenga el vínculo"</strong> (rol: <em>Lector</em>).</li>
-            <li>¡Listo! La app leerá en tiempo real todas las respuestas sin pedir contraseñas.</li>
-          </ol>
         </div>
 
         <!-- Acciones -->
-        <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
           <button onclick="loadSampleData()" class="text-xs font-display font-bold text-slate-700 hover:text-slate-900 underline">
-            Cargar consultas de prueba
+            Restaurar datos de muestra
           </button>
           <div class="flex gap-2.5">
             <button onclick="closeModalSettings()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-display font-bold">Cerrar</button>
-            <button onclick="saveSettings()" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold transition">Guardar</button>
+            <button onclick="saveSettings()" class="btn-action-primary px-5 py-2 rounded-xl font-display font-extrabold transition">Guardar Configuración</button>
           </div>
         </div>
 
@@ -576,8 +1327,29 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL DE CONFIRMACIÓN DE ELIMINACIÓN ==================== -->
+  <div id="modal-confirm-delete" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-4 animate-in text-center">
+      <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 id="confirm-delete-title" class="font-serif text-lg font-bold text-slate-900">¿Eliminar este registro?</h3>
+        <p id="confirm-delete-desc" class="text-xs text-slate-500 mt-1">Esta acción no se puede deshacer y se actualizará en Google Sheets.</p>
+      </div>
+      <div class="flex items-center justify-center gap-2.5 pt-2">
+        <button onclick="closeConfirmDeleteModal()" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-display font-bold">
+          Cancelar
+        </button>
+        <button id="btn-confirm-delete-action" class="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-display font-extrabold shadow-sm">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white border border-slate-700 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-display font-bold">
+  <div id="toast" class="fixed bottom-16 md:bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white border border-slate-700 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-display font-bold">
     <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
     <span id="toast-message">Operación exitosa</span>
   </div>

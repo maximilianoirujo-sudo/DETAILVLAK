@@ -1,15 +1,17 @@
 /**
- * DetailVlak - Sistema de Tasación Automática & Gestión de Turnos
- * Estética Monocromática Oficial CarVlak (Instrument Sans + Piazzolla + Plus Jakarta Sans)
- * Diseñado para Maximiliano & Romina
+ * DetailVlak - Sistema Integral ERP & CRM Automotriz
+ * Módulos: Tasaciones, Dashboard Financiero, Control de Stock, Gastos, Comisiones & Persistencia Google Sheets
+ * Diseñado para Maximiliano & Romina (Shangrilá, Canelones, Uruguay)
  */
 
-// ================= ESTADO GLOBAL =================
+// ================= CONFIGURACIÓN Y ESTADO GLOBAL =================
 const DEFAULT_CONFIG = {
   shopName: "DetailVlak",
   shopAddress: "Av. Giannattasio y, 15000 Shangrilá, Canelones",
   sheetUrl: "https://docs.google.com/spreadsheets/d/1CCKm7B1q3YtC85SUp5Ub25u4t1DRhZ_0rlyHWCRurgg/edit?resourcekey=&gid=2130104281#gid=2130104281",
-  activeUser: "Maximiliano"
+  scriptUrl: "",
+  activeUser: "Maximiliano",
+  commissionRate: 30
 };
 
 const DEFAULT_TARIFFS = [
@@ -59,135 +61,372 @@ const DEFAULT_TARIFFS = [
     shortName: "Corrección de pintura / Pulido",
     description: "Corte, pulido y abrillantado técnico para devolver el brillo espejo y eliminar marcas de lavado.",
     durationHours: 8,
-    prices: { chico: 5000, mediano: 6200, suv: 7500, pickup: 9000, moto: 3500 }
+    prices: { chico: 6800, mediano: 7900, suv: 9200, pickup: 10800, moto: 3800 }
   },
   {
     id: "ceramico",
-    name: "Tratamiento Cerámico o Acrílico (Vidrio líquido / protección de larga duración)",
-    shortName: "Tratamiento Cerámico (Vidrio Líquido)",
-    description: "Aplicación de coating cerámico nanotecnológico con protección de 1 a 3 años, repelencia extrema y brillo hidrofóbico.",
-    durationHours: 10,
-    prices: { chico: 10000, mediano: 12500, suv: 15000, pickup: 18000, moto: 6500 }
+    name: "Tratamiento Acrílico o Cerámico (Sellado de alto brillo y protección)",
+    shortName: "Sellado Cerámico / Acrílico",
+    description: "Protección hidrofóbica de larga duración contra rayos UV, lluvia ácida y contaminación.",
+    durationHours: 8,
+    prices: { chico: 8500, mediano: 9800, suv: 11500, pickup: 13200, moto: 4500 }
   },
   {
     id: "llantas",
-    name: "Limpieza y sellado de llantas y pasarruedas",
-    shortName: "Sellado de llantas y pasarruedas",
-    description: "Descontaminación férrica profunda y sellado térmico antiadherente de polvo de freno.",
+    name: "Detallado profundo de llantas, cálipers y pasarruedas",
+    shortName: "Detallado de llantas y chasis",
+    description: "Descontaminado férrico de llantas, limpieza de pasarruedas y sellado protector.",
     durationHours: 2,
-    prices: { chico: 1200, mediano: 1200, suv: 1500, pickup: 1500, moto: 900 }
+    prices: { chico: 1600, mediano: 1800, suv: 2200, pickup: 2500, moto: 1200 }
+  }
+];
+
+const DEFAULT_STOCK = [
+  {
+    id: "stk-shampoo",
+    name: "Shampoo pH Neutro Concentrado",
+    category: "Químicos",
+    unit: "litros",
+    quantity: 4.5,
+    minStock: 2,
+    unitCost: 850,
+    supplier: "Detailing Pro UY",
+    updatedAt: getTodayISO()
+  },
+  {
+    id: "stk-apc",
+    name: "APC Limpiador Multiuso (Interior/Motor)",
+    category: "Químicos",
+    unit: "litros",
+    quantity: 1.5,
+    minStock: 2,
+    unitCost: 790,
+    supplier: "Detailing Pro UY",
+    updatedAt: getTodayISO()
+  },
+  {
+    id: "stk-ceramico",
+    name: "Coating Cerámico 9H (Frasco 30ml)",
+    category: "Químicos",
+    unit: "unidades",
+    quantity: 1,
+    minStock: 2,
+    unitCost: 2400,
+    supplier: "Importador CarCare",
+    updatedAt: getTodayISO()
+  },
+  {
+    id: "stk-microfibra",
+    name: "Paños Microfibra Sin Costura 40x40 (400gsm)",
+    category: "Paños/Microfibras",
+    unit: "unidades",
+    quantity: 16,
+    minStock: 10,
+    unitCost: 190,
+    supplier: "Detailing Pro UY",
+    updatedAt: getTodayISO()
+  },
+  {
+    id: "stk-pad-corte",
+    name: "Pad de Pulido Heavy Cut 5 pulgadas",
+    category: "Pads",
+    unit: "unidades",
+    quantity: 4,
+    minStock: 3,
+    unitCost: 650,
+    supplier: "Importador CarCare",
+    updatedAt: getTodayISO()
+  },
+  {
+    id: "stk-cuero",
+    name: "Acondicionador & Nutrientes para Cuero Mate",
+    category: "Químicos",
+    unit: "litros",
+    quantity: 2.0,
+    minStock: 1,
+    unitCost: 1150,
+    supplier: "Detailing Pro UY",
+    updatedAt: getTodayISO()
   }
 ];
 
 const SAMPLE_LEADS = [
   {
-    id: "lead-1",
-    timestamp: "2026-09-09 14:22:10",
-    name: "Federico Cabrera",
-    phone: "099123456",
-    vehicle: "Volkswagen Golf 1.4 TSI 2018",
-    color: "Gris Platino",
+    id: "lead-enzo-208",
+    timestamp: "14/09/2026 16:56",
+    name: "Enzo Eirin",
+    phone: "094 037 225",
+    vehicle: "Peugeot 208 2016",
+    color: "",
     category: "chico",
     requestedServices: [
-      "Limpieza profunda de interiores (Tapizados, alfombras, techo, paneles y desinfección)",
-      "Lavado y detallado técnico de motor (Vapor / dieléctrico + acondicionador de plásticos)"
+      "Lavado y detallado técnico de motor",
+      "Limpieza profunda de interiores (Tapizados, alfombras, techo, paneles y desinfección)"
     ],
-    customerNotes: "Tiene unas manchas de café en los asientos delanteros y un poco de barro en el piso del conductor.",
-    preferredDate: "Esta semana / Lo antes posible",
+    customerNotes: "El auto se pintó y le quedó salpicón de pintura en interior de las ruedas (guardabarros) y ya aprovechar a lavar motor y limpieza general de tapizados y techo.",
+    preferredDate: "Sin apuro / Solo estoy consultando presupuesto",
     source: "Instagram Reels",
     status: "NUEVO",
     assignedTo: "Maximiliano",
-    quotedServices: [],
-    quotedTotal: 0,
+    quotedServices: ["motor", "interior"],
+    quotedTotal: 5300,
     discountAmount: 0,
-    timeEstimate: "",
-    internalNotes: ""
+    timeEstimate: "Aprox. 1 jornada (6 a 8 horas)",
+    completedAt: ""
   },
   {
-    id: "lead-2",
-    timestamp: "2026-09-09 15:45:00",
-    name: "Mariana Silva",
-    phone: "094987654",
-    vehicle: "Toyota Hilux 4x4 2021",
-    color: "Blanca",
-    category: "pickup",
+    id: "lead-sample-1",
+    timestamp: "22/09/2026 10:15",
+    name: "Martín Rodríguez",
+    phone: "099 412 883",
+    vehicle: "Volkswagen Vento 2.0 TSI (Negro)",
+    color: "Negro",
+    category: "mediano",
     requestedServices: [
-      "Limpieza profunda de interiores (Tapizados, alfombras, techo, paneles y desinfección)",
-      "Tratamiento Cerámico o Acrílico (Vidrio líquido / protección de larga duración)",
-      "Lavado y detallado técnico de motor (Vapor / dieléctrico + acondicionador de plásticos)"
+      "Pulido / Corrección de pintura",
+      "Tratamiento Acrílico o Cerámico"
     ],
-    customerNotes: "Uso la camioneta para ir al campo. El interior está con polvo y quiero proteger la pintura porque duerme afuera.",
-    preferredDate: "Próximas 2 semanas",
-    source: "TikTok",
-    status: "COTIZADO",
-    assignedTo: "Romina",
-    quotedServices: ["interior", "motor", "ceramico"],
-    quotedTotal: 23400,
-    discountAmount: 2600,
-    timeEstimate: "2 días de trabajo",
-    internalNotes: "Le ofrecí 10% de descuento combo interior + cerámico."
+    customerNotes: "Tiene bastantes marcas circulares de lavadero y quiero dejarlo espejo y sellado.",
+    preferredDate: "Esta semana",
+    source: "Instagram / TikTok",
+    status: "FINALIZADO",
+    assignedTo: "Maximiliano",
+    quotedServices: ["pulido", "ceramico"],
+    quotedTotal: 15930,
+    discountAmount: 1770,
+    timeEstimate: "1 a 2 días de trabajo en taller",
+    completedAt: getTodayISO()
   },
   {
-    id: "lead-3",
-    timestamp: "2026-09-09 16:10:35",
-    name: "Gonzalo Méndez",
-    phone: "098555123",
-    vehicle: "Chevrolet Tracker Premier 2022",
-    color: "Azul Eclipse",
+    id: "lead-sample-2",
+    timestamp: "23/09/2026 14:30",
+    name: "Camila Fernández",
+    phone: "098 331 904",
+    vehicle: "Chevrolet Tracker Premier 2022 (Blanca)",
+    color: "Blanca",
     category: "suv",
     requestedServices: [
-      "Pulido y restauración de ópticas / faros (Lijado + pulido + protección UV)",
-      "Pulido / Corrección de pintura (Eliminación de microrayones / swirls)"
+      "Limpieza profunda de interiores",
+      "Nutrición y restauración de tapizados de cuero"
     ],
-    customerNotes: "Tiene rayas suaves en el capot y una óptica opaca.",
-    preferredDate: "Lo antes posible",
-    source: "YouTube Shorts",
-    status: "NUEVO",
-    assignedTo: "Maximiliano",
-    quotedServices: [],
-    quotedTotal: 0,
+    customerNotes: "Volcamos un café con leche en el asiento trasero y queremos desinfectar todo el interior.",
+    preferredDate: "Próxima semana",
+    source: "Recomendación",
+    status: "TURNO",
+    assignedTo: "Romina",
+    quotedServices: ["interior", "cuero"],
+    quotedTotal: 8100,
     discountAmount: 0,
-    timeEstimate: "",
-    internalNotes: ""
+    timeEstimate: "1 jornada completa (9:00 a 18:00 hs)",
+    completedAt: ""
   }
 ];
 
-// Variables en memoria
 let appState = {
   config: { ...DEFAULT_CONFIG },
-  tariffs: [...DEFAULT_TARIFFS],
+  tariffs: JSON.parse(JSON.stringify(DEFAULT_TARIFFS)),
   leads: [],
+  stock: [],
+  stockMovements: [],
+  expenses: [],
+  commissions: [],
+  activeMainTab: "tasaciones",
   activeFilter: "ALL",
   activeOpFilter: "ALL",
+  activeStockCatFilter: "ALL",
   currentLead: null,
-  currentTemplateKey: "formal"
+  isCreatingNewManual: false,
+  currentTemplateKey: "formal",
+  hasPendingSync: false
 };
+
+// ================= UTILIDADES DE FECHA Y MONEDA ($UYU) =================
+function getTodayISO() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getCurrentYearMonth() {
+  return getTodayISO().slice(0, 7); // YYYY-MM
+}
+
+function formatUYU(amount) {
+  const num = Math.round(Number(amount) || 0);
+  return "$" + num.toLocaleString("es-UY");
+}
+
+function extractYearMonthFromDateStr(str) {
+  if (!str) return getCurrentYearMonth();
+  const s = String(str).trim();
+  // Formato ISO YYYY-MM-DD
+  if (/^\d{4}-\d{2}/.test(s)) return s.slice(0, 7);
+  // Formato DD/MM/YYYY
+  const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmy) {
+    const day = Number(dmy[1]);
+    const month = Number(dmy[2]);
+    const year = dmy[3];
+    // Si month > 12 es MM/DD/YYYY (como el Timestamp de Google Forms en inglés 9/14/2026)
+    if (month > 12) {
+      return `${year}-${String(day).padStart(2, "0")}`;
+    }
+    return `${year}-${String(month).padStart(2, "0")}`;
+  }
+  return getCurrentYearMonth();
+}
+
+function formatMonthLabel(ym) {
+  if (!ym || ym === "ALL") return "Todo el Historial";
+  const [y, m] = ym.split("-");
+  const names = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+  const idx = parseInt(m, 10) - 1;
+  return `${names[idx] || m} ${y}`;
+}
+
+function formatReadableDate(dateStr) {
+  if (!dateStr) return "-";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [y, m, d] = dateStr.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  return dateStr;
+}
 
 // ================= INICIALIZACIÓN =================
 document.addEventListener("DOMContentLoaded", () => {
   loadStoredData();
+  reconcileCommissions(false);
+  initDefaultDatesAndFilters();
   applyActiveUserUI();
-  renderLeads();
-  updateStats();
+  renderAllViews();
 
-  // Intentar sincronización inicial silenciosa
+  // Sincronización silenciosa inicial con Google Sheets / Apps Script
   syncGoogleSheets(true);
 });
 
-// Guardar / Cargar en LocalStorage
+function initDefaultDatesAndFilters() {
+  const expDate = document.getElementById("exp-date");
+  if (expDate && !expDate.value) expDate.value = getTodayISO();
+  populateMonthSelectors();
+}
+
+function populateMonthSelectors() {
+  const monthsSet = new Set();
+  const currentYM = getCurrentYearMonth();
+  monthsSet.add(currentYM);
+
+  // Agregar últimos 6 meses por defecto
+  const now = new Date();
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    monthsSet.add(ym);
+  }
+
+  // Agregar meses presentes en datos
+  appState.leads.forEach(l => {
+    if (l.completedAt) monthsSet.add(extractYearMonthFromDateStr(l.completedAt));
+    if (l.timestamp) monthsSet.add(extractYearMonthFromDateStr(l.timestamp));
+  });
+  appState.expenses.forEach(e => {
+    if (e.date) monthsSet.add(extractYearMonthFromDateStr(e.date));
+  });
+  appState.commissions.forEach(c => {
+    if (c.date) monthsSet.add(extractYearMonthFromDateStr(c.date));
+  });
+
+  const sortedMonths = Array.from(monthsSet).filter(Boolean).sort().reverse();
+
+  const selectors = ["dashboard-month-filter", "exp-filter-month", "comm-filter-month"];
+  selectors.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const prevVal = sel.value || currentYM;
+    sel.innerHTML =
+      sortedMonths.map(ym => `<option value="${ym}">${formatMonthLabel(ym)}${ym === currentYM ? " (Actual)" : ""}</option>`).join("") +
+      `<option value="ALL">📅 Todo el Historial</option>`;
+    sel.value = sortedMonths.includes(prevVal) || prevVal === "ALL" ? prevVal : currentYM;
+  });
+}
+
+// ================= NAVEGACIÓN ENTRE PESTAÑAS =================
+function switchMainTab(tabName) {
+  appState.activeMainTab = tabName;
+
+  const views = ["tasaciones", "dashboard", "stock", "gastos", "comisiones"];
+  views.forEach(v => {
+    const el = document.getElementById(`view-${v}`);
+    if (el) el.classList.toggle("hidden", v !== tabName);
+  });
+
+  document.querySelectorAll("[data-main-tab]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mainTab === tabName);
+  });
+  document.querySelectorAll("[data-mobile-tab]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mobileTab === tabName);
+  });
+
+  populateMonthSelectors();
+  renderAllViews();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderAllViews() {
+  renderLeads();
+  updateStats();
+  renderDashboard();
+  renderStock();
+  renderExpenses();
+  renderCommissions();
+  updateNavigationBadges();
+  lucide.createIcons();
+}
+
+function updateNavigationBadges() {
+  const badgeTasaciones = document.getElementById("nav-badge-tasaciones");
+  if (badgeTasaciones) badgeTasaciones.innerText = appState.leads.length;
+
+  const lowStockCount = appState.stock.filter(item => Number(item.quantity) <= Number(item.minStock)).length;
+  const badgeStock = document.getElementById("nav-badge-stock");
+  const mobileBadgeStock = document.getElementById("mobile-badge-stock");
+  if (badgeStock) {
+    badgeStock.innerText = lowStockCount;
+    badgeStock.classList.toggle("hidden", lowStockCount === 0);
+  }
+  if (mobileBadgeStock) {
+    mobileBadgeStock.classList.toggle("hidden", lowStockCount === 0);
+  }
+
+  const pendingCommCount = appState.commissions.filter(c => c.status !== "PAGADA").length;
+  const badgeComm = document.getElementById("nav-badge-comisiones");
+  if (badgeComm) {
+    badgeComm.innerText = pendingCommCount;
+    badgeComm.classList.toggle("hidden", pendingCommCount === 0);
+  }
+}
+
+// ================= PERSISTENCIA LOCAL & CLOUD (GOOGLE APPS SCRIPT) =================
 function loadStoredData() {
   try {
     const savedConfig = localStorage.getItem("detailvlak_config");
     if (savedConfig) {
       appState.config = { ...DEFAULT_CONFIG, ...JSON.parse(savedConfig) };
-      // Migración automática si la URL guardada en el dispositivo corresponde a la pestaña anterior
       if (appState.config.sheetUrl && (appState.config.sheetUrl.includes("1975903270") || !appState.config.sheetUrl.includes("2130104281"))) {
         appState.config.sheetUrl = DEFAULT_CONFIG.sheetUrl;
-        saveConfig();
       }
+      if (appState.config.commissionRate === undefined || appState.config.commissionRate === null) {
+        appState.config.commissionRate = 30;
+      }
+      saveConfigLocal();
     } else {
       appState.config = { ...DEFAULT_CONFIG };
-      saveConfig();
+      saveConfigLocal();
     }
 
     const savedTariffs = localStorage.getItem("detailvlak_tariffs");
@@ -197,121 +436,287 @@ function loadStoredData() {
     if (savedLeads) {
       appState.leads = JSON.parse(savedLeads);
     } else {
-      appState.leads = [...SAMPLE_LEADS];
-      saveLeads();
+      appState.leads = JSON.parse(JSON.stringify(SAMPLE_LEADS));
     }
+
+    const savedStock = localStorage.getItem("detailvlak_stock");
+    if (savedStock) {
+      appState.stock = JSON.parse(savedStock);
+    } else {
+      appState.stock = JSON.parse(JSON.stringify(DEFAULT_STOCK));
+    }
+
+    const savedMovements = localStorage.getItem("detailvlak_stock_movements");
+    if (savedMovements) {
+      appState.stockMovements = JSON.parse(savedMovements);
+    } else {
+      appState.stockMovements = [
+        {
+          id: "mov-init-1",
+          date: getTodayISO() + " 09:00",
+          productId: "stk-shampoo",
+          productName: "Shampoo pH Neutro Concentrado",
+          type: "ENTRADA",
+          quantity: 4.5,
+          unit: "litros",
+          operator: "Maximiliano",
+          note: "Inventario inicial de taller"
+        }
+      ];
+    }
+
+    const savedExpenses = localStorage.getItem("detailvlak_expenses");
+    if (savedExpenses) {
+      appState.expenses = JSON.parse(savedExpenses);
+    } else {
+      appState.expenses = [
+        {
+          id: "exp-init-1",
+          date: getTodayISO(),
+          amount: 2450,
+          category: "Insumos",
+          description: "Reposición microfibras y APC concentrado",
+          paymentMethod: "Transferencia",
+          operator: "Maximiliano"
+        }
+      ];
+    }
+
+    const savedCommissions = localStorage.getItem("detailvlak_commissions");
+    if (savedCommissions) {
+      appState.commissions = JSON.parse(savedCommissions);
+    }
+
+    saveAllLocalOnly();
   } catch (e) {
-    console.error("Error al cargar localStorage:", e);
-    appState.leads = [...SAMPLE_LEADS];
+    console.error("Error al cargar almacenamiento local:", e);
+    appState.leads = JSON.parse(JSON.stringify(SAMPLE_LEADS));
+    appState.stock = JSON.parse(JSON.stringify(DEFAULT_STOCK));
   }
 }
 
-function saveConfig() {
+function saveConfigLocal() {
   localStorage.setItem("detailvlak_config", JSON.stringify(appState.config));
 }
 
-function saveTariffs() {
+function saveAllLocalOnly() {
+  localStorage.setItem("detailvlak_config", JSON.stringify(appState.config));
   localStorage.setItem("detailvlak_tariffs", JSON.stringify(appState.tariffs));
+  localStorage.setItem("detailvlak_leads", JSON.stringify(appState.leads));
+  localStorage.setItem("detailvlak_stock", JSON.stringify(appState.stock));
+  localStorage.setItem("detailvlak_stock_movements", JSON.stringify(appState.stockMovements));
+  localStorage.setItem("detailvlak_expenses", JSON.stringify(appState.expenses));
+  localStorage.setItem("detailvlak_commissions", JSON.stringify(appState.commissions));
 }
 
 function saveLeads() {
-  localStorage.setItem("detailvlak_leads", JSON.stringify(appState.leads));
+  reconcileCommissions(false);
+  saveAllLocalOnly();
+  pushStateToCloud();
 }
 
-// ================= OPERADORES (MAXIMILIANO / ROMINA) =================
-function setActiveUser(userName) {
-  appState.config.activeUser = userName;
-  saveConfig();
-  applyActiveUserUI();
-  showToast(`Operador activo: ${userName}`);
-  if (appState.currentLead) {
-    updatePreviewMessage();
+function saveTariffs() {
+  saveAllLocalOnly();
+  pushStateToCloud();
+}
+
+function saveConfig() {
+  reconcileCommissions(false);
+  saveAllLocalOnly();
+  pushStateToCloud();
+}
+
+function saveAllAndSync() {
+  reconcileCommissions(false);
+  saveAllLocalOnly();
+  pushStateToCloud();
+}
+
+function updateCloudStatusUI(status, text) {
+  const dot = document.getElementById("cloud-status-dot");
+  const label = document.getElementById("cloud-sync-text");
+  const errorBanner = document.getElementById("sync-error-banner");
+
+  if (label) label.innerText = text;
+
+  if (status === "ok") {
+    if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-emerald-400";
+    if (errorBanner) errorBanner.classList.add("hidden");
+    appState.hasPendingSync = false;
+  } else if (status === "syncing") {
+    if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping";
+  } else if (status === "error") {
+    if (dot) dot.className = "inline-block w-2 h-2 rounded-full bg-red-500";
+    if (errorBanner) errorBanner.classList.remove("hidden");
+    appState.hasPendingSync = true;
   }
 }
 
-function applyActiveUserUI() {
-  const isMaxi = appState.config.activeUser === "Maximiliano";
-  const isRomi = appState.config.activeUser === "Romina";
-
-  // Cambiar tema de la app: "romina" (negro y rosa) o "maxi" (monocromático blanco y negro)
-  document.documentElement.setAttribute("data-operator", isRomi ? "romina" : "maxi");
-
-  const btnMaxi = document.getElementById("btn-user-maxi");
-  const btnRomi = document.getElementById("btn-user-romi");
-
-  if (btnMaxi && btnRomi) {
-    btnMaxi.classList.toggle("active", isMaxi);
-    btnRomi.classList.toggle("active", isRomi);
+async function pushStateToCloud() {
+  const scriptUrl = (appState.config.scriptUrl || "").trim();
+  if (!scriptUrl) {
+    updateCloudStatusUI("ok", "Modo Local + Forms Activo");
+    return;
   }
 
-  // Re-renderizar lista para actualizar chips y acentos
-  renderLeads();
+  updateCloudStatusUI("syncing", "Guardando en Google Sheets...");
+
+  try {
+    const payload = {
+      leads: appState.leads,
+      tariffs: appState.tariffs,
+      stock: appState.stock,
+      stockMovements: appState.stockMovements,
+      expenses: appState.expenses,
+      commissions: appState.commissions,
+      config: appState.config
+    };
+
+    const response = await fetch(scriptUrl, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    if (data && data.ok) {
+      if (data.formResponses && data.formResponses.length > 1) {
+        parseFormRowsArray(data.formResponses);
+      }
+      updateCloudStatusUI("ok", "Sincronizado en Google Sheets");
+    } else {
+      throw new Error(data.error || "Respuesta inválida del Script");
+    }
+  } catch (err) {
+    console.warn("Error sincronizando con Google Apps Script:", err);
+    updateCloudStatusUI("error", "Sin conexión (Guardado en dispositivo)");
+  }
 }
 
-// ================= SINCRONIZACIÓN CON GOOGLE SHEETS =================
+// ================= SINCRONIZACIÓN COMPLETA CON GOOGLE SHEETS =================
 async function syncGoogleSheets(isSilent = false) {
   const icon = document.getElementById("icon-sync");
   if (icon) icon.classList.add("animate-spin");
 
-  const sheetUrl = appState.config.sheetUrl;
-  const noticeBanner = document.getElementById("sheet-notice-banner");
-  const statusText = document.getElementById("sheet-status-text");
+  const scriptUrl = (appState.config.scriptUrl || "").trim();
+  let syncedViaScript = false;
 
-  // Extraer Spreadsheet ID y GID
-  const idMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-  const gidMatch = sheetUrl.match(/[#&?]gid=([0-9]+)/);
-
-  const spreadsheetId = idMatch ? idMatch[1] : null;
-  const gid = gidMatch ? gidMatch[1] : "0";
-
-  if (!spreadsheetId) {
-    if (!isSilent) showToast("Enlace de Google Sheets inválido", "error");
-    if (icon) icon.classList.remove("animate-spin");
-    return;
-  }
-
-  // Endpoints públicos de exportación CSV de Google Sheets
-  const csvUrls = [
-    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`,
-    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}`
-  ];
-
-  let csvText = null;
-
-  for (const url of csvUrls) {
+  // 1. Si hay Web App de Google Apps Script configurado, sincronizar todas las hojas
+  if (scriptUrl) {
     try {
-      const resp = await fetch(url);
+      updateCloudStatusUI("syncing", "Sincronizando con Google Sheets...");
+      const resp = await fetch(scriptUrl);
       if (resp.ok) {
-        csvText = await resp.text();
-        break;
+        const cloud = await resp.json();
+        if (cloud && cloud.ok) {
+          syncedViaScript = true;
+
+          if (Array.isArray(cloud.leads) && cloud.leads.length > 0) {
+            appState.leads = mergeCollectionsById(appState.leads, cloud.leads);
+          }
+          if (Array.isArray(cloud.tariffs) && cloud.tariffs.length > 0) {
+            appState.tariffs = cloud.tariffs;
+          }
+          if (Array.isArray(cloud.stock) && cloud.stock.length > 0) {
+            appState.stock = cloud.stock;
+          }
+          if (Array.isArray(cloud.stockMovements) && cloud.stockMovements.length > 0) {
+            appState.stockMovements = mergeCollectionsById(appState.stockMovements, cloud.stockMovements);
+          }
+          if (Array.isArray(cloud.expenses) && cloud.expenses.length > 0) {
+            appState.expenses = mergeCollectionsById(appState.expenses, cloud.expenses);
+          }
+          if (Array.isArray(cloud.commissions) && cloud.commissions.length > 0) {
+            appState.commissions = mergeCollectionsById(appState.commissions, cloud.commissions);
+          }
+          if (cloud.config && typeof cloud.config === "object") {
+            const activeOp = appState.config.activeUser;
+            appState.config = { ...appState.config, ...cloud.config, activeUser: activeOp };
+          }
+          if (Array.isArray(cloud.formResponses) && cloud.formResponses.length > 1) {
+            parseFormRowsArray(cloud.formResponses);
+          }
+
+          reconcileCommissions(false);
+          saveAllLocalOnly();
+          await pushStateToCloud();
+          renderAllViews();
+          if (!isSilent) showToast("¡Sincronización completa con Google Sheets!");
+        }
       }
     } catch (err) {
-      // Intentar el siguiente endpoint
+      console.warn("Error en GET de Apps Script:", err);
+      updateCloudStatusUI("error", "Fallo de conexión con Google Sheets");
+      if (!isSilent) showToast("No se pudo conectar con Google Sheets. Datos guardados en el dispositivo.", "error");
+    }
+  }
+
+  // 2. Además (o como respaldo si aún no pegaron el Script URL), leer el CSV de Google Forms
+  if (!syncedViaScript) {
+    const sheetUrl = appState.config.sheetUrl;
+    const noticeBanner = document.getElementById("sheet-notice-banner");
+
+    const idMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    const gidMatch = sheetUrl.match(/[#&?]gid=([0-9]+)/);
+    const spreadsheetId = idMatch ? idMatch[1] : null;
+    const gid = gidMatch ? gidMatch[1] : "2130104281";
+
+    if (spreadsheetId) {
+      const csvUrls = [
+        `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`,
+        `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}`
+      ];
+
+      let csvText = null;
+      for (const url of csvUrls) {
+        try {
+          const resp = await fetch(url);
+          if (resp.ok) {
+            csvText = await resp.text();
+            break;
+          }
+        } catch (err) {}
+      }
+
+      if (csvText && csvText.trim().length > 0) {
+        parseGoogleSheetsCSV(csvText);
+        if (noticeBanner) noticeBanner.classList.add("hidden");
+        updateCloudStatusUI("ok", "Forms Conectado (Falta URL Apps Script)");
+        if (!isSilent) showToast("¡Respuestas de Google Forms sincronizadas!");
+        renderAllViews();
+      } else if (!scriptUrl) {
+        if (!isSilent) {
+          showToast("La hoja está privada. Configurá el Web App en Ajustes (⚙️).", "error");
+        }
+      }
     }
   }
 
   if (icon) icon.classList.remove("animate-spin");
+}
 
-  if (csvText && csvText.trim().length > 0) {
-    parseGoogleSheetsCSV(csvText);
-    if (noticeBanner) noticeBanner.classList.add("hidden");
-    if (!isSilent) showToast("¡Respuestas de Google Forms sincronizadas!");
-    renderLeads();
-    updateStats();
-  } else {
-    if (noticeBanner && statusText) {
-      noticeBanner.classList.remove("hidden");
-      statusText.innerHTML = `La hoja de Google Sheets está en modo <strong>Restringido</strong>. Para sincronizar en vivo con un clic, configurala como <em>"Cualquier persona con el vínculo puede ser Lector"</em>.`;
+function mergeCollectionsById(localArr, cloudArr) {
+  const map = new Map();
+  cloudArr.forEach(item => {
+    if (item && item.id) map.set(item.id, item);
+  });
+  localArr.forEach(item => {
+    if (item && item.id && !map.has(item.id)) {
+      map.set(item.id, item);
     }
-    if (!isSilent) {
-      openSheetGuideModal();
-    }
-  }
+  });
+  return Array.from(map.values());
 }
 
 function parseGoogleSheetsCSV(csvText) {
   const rows = parseCSVToArray(csvText);
   if (rows.length < 2) return;
+  parseFormRowsArray(rows);
+}
+
+function parseFormRowsArray(rows) {
+  if (!rows || rows.length < 2) return;
 
   const headers = rows[0].map(h => (h || "").trim().toLowerCase());
 
@@ -330,30 +735,30 @@ function parseGoogleSheetsCSV(csvText) {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (!row || row.length === 0 || !row[colName] || row[colName].trim() === "") continue;
+    if (!row || row.length === 0 || !row[colName] || String(row[colName]).trim() === "") continue;
 
-    const name = (row[colName] || "").trim();
-    const phone = (row[colPhone] || "").trim();
-    const vehicle = (colVehicle !== -1 ? row[colVehicle] : "Vehículo no especificado").trim();
-    const timestamp = (colTimestamp !== -1 ? row[colTimestamp] : new Date().toISOString()).trim();
+    const name = String(row[colName] || "").trim();
+    const phone = String(row[colPhone] || "").trim();
+    const vehicle = (colVehicle !== -1 ? String(row[colVehicle] || "") : "Vehículo no especificado").trim();
+    const timestamp = (colTimestamp !== -1 ? String(row[colTimestamp] || "") : getTodayISO()).trim();
 
     const leadId = "lead-" + btoa(encodeURIComponent(name + phone + timestamp)).replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
     const existingLead = appState.leads.find(l => l.id === leadId);
 
-    const rawCategory = colCategory !== -1 ? (row[colCategory] || "") : "";
+    const rawCategory = colCategory !== -1 ? String(row[colCategory] || "") : "";
     const category = normalizeCarCategory(rawCategory);
 
-    const rawServices = colServices !== -1 ? (row[colServices] || "") : "";
+    const rawServices = colServices !== -1 ? String(row[colServices] || "") : "";
     const requestedServices = rawServices.split(/[,;\n]/).map(s => s.trim()).filter(s => s.length > 0);
 
-    const customerNotes = colNotes !== -1 ? (row[colNotes] || "").trim() : "";
-    const preferredDate = colDate !== -1 ? (row[colDate] || "").trim() : "";
-    const source = colSource !== -1 ? (row[colSource] || "").trim() : "Google Form";
-    const color = colColor !== -1 ? (row[colColor] || "").trim() : "";
+    const customerNotes = colNotes !== -1 ? String(row[colNotes] || "").trim() : "";
+    const preferredDate = colDate !== -1 ? String(row[colDate] || "").trim() : "";
+    const source = colSource !== -1 ? String(row[colSource] || "").trim() : "Google Form";
+    const color = colColor !== -1 ? String(row[colColor] || "").trim() : "";
 
     if (!existingLead) {
       newCount++;
-      appState.leads.unshift({
+      const tempLead = {
         id: leadId,
         timestamp,
         name,
@@ -371,14 +776,23 @@ function parseGoogleSheetsCSV(csvText) {
         quotedTotal: 0,
         discountAmount: 0,
         timeEstimate: "",
-        internalNotes: ""
-      });
+        completedAt: ""
+      };
+      // Pre-calcular servicios sugeridos y monto inicial
+      const matchedIds = detectServicesFromLead(tempLead);
+      tempLead.quotedServices = matchedIds;
+      tempLead.quotedTotal = matchedIds.reduce((sum, id) => {
+        const t = appState.tariffs.find(x => x.id === id);
+        return sum + (t && t.prices ? (t.prices[category] || 0) : 0);
+      }, 0);
+
+      appState.leads.unshift(tempLead);
     }
   }
 
-  saveLeads();
+  saveAllLocalOnly();
   if (newCount > 0) {
-    showToast(`Se incorporaron ${newCount} nuevas consultas.`);
+    showToast(`Se incorporaron ${newCount} nuevas consultas del formulario.`);
   }
 }
 
@@ -438,10 +852,84 @@ function getCategoryLabel(catKey) {
   }
 }
 
-// ================= RENDERIZADO DE LEADS & FILTROS =================
+// ================= OPERADORES (MAXIMILIANO / ROMINA) =================
+function setActiveUser(userName) {
+  appState.config.activeUser = userName;
+  saveConfigLocal();
+  applyActiveUserUI();
+  showToast(`Operador activo: ${userName}`);
+  if (appState.currentLead) {
+    updatePreviewMessage();
+  }
+}
+
+function applyActiveUserUI() {
+  const isMaxi = appState.config.activeUser === "Maximiliano";
+  const isRomi = appState.config.activeUser === "Romina";
+
+  document.documentElement.setAttribute("data-operator", isRomi ? "romina" : "maxi");
+
+  const btnMaxi = document.getElementById("btn-user-maxi");
+  const btnRomi = document.getElementById("btn-user-romi");
+  if (btnMaxi) btnMaxi.classList.toggle("active", isMaxi);
+  if (btnRomi) btnRomi.classList.toggle("active", isRomi);
+
+  const expOpLabel = document.getElementById("quick-expense-operator-label");
+  if (expOpLabel) expOpLabel.innerText = appState.config.activeUser;
+}
+
+// ================= MOTOR AUTOMÁTICO DE COMISIONES (MAXIMILIANO 30%) =================
+function reconcileCommissions(shouldSync = false) {
+  const rate = Number(appState.config.commissionRate) || 30;
+  const existingMap = new Map();
+  appState.commissions.forEach(c => {
+    if (c && c.leadId) existingMap.set(c.leadId, c);
+  });
+
+  const updatedCommissions = [];
+
+  appState.leads.forEach(lead => {
+    // Regla estricta: Solo Maximiliano cobra comisión cuando el trabajo está en estado FINALIZADO (✅ Trabajo Completado)
+    if (lead.status === "FINALIZADO" && lead.assignedTo === "Maximiliano") {
+      if (!lead.completedAt) {
+        lead.completedAt = getTodayISO();
+      }
+      const jobTotal = Number(lead.quotedTotal) || 0;
+      const commAmount = Math.round(jobTotal * (rate / 100));
+      const prev = existingMap.get(lead.id);
+
+      updatedCommissions.push({
+        id: prev ? prev.id : `comm-${lead.id}`,
+        leadId: lead.id,
+        date: lead.completedAt || extractYearMonthFromDateStr(lead.timestamp) + "-01",
+        clientName: lead.name || "Cliente",
+        vehicle: lead.vehicle || "Vehículo",
+        jobTotal: jobTotal,
+        rate: rate,
+        commissionAmount: commAmount,
+        status: prev ? prev.status : "PENDIENTE",
+        paidAt: prev ? prev.paidAt : ""
+      });
+    }
+  });
+
+  appState.commissions = updatedCommissions;
+
+  // Actualizar etiquetas del porcentaje en UI
+  const rateBadge = document.getElementById("comm-rate-badge");
+  const thRate = document.getElementById("comm-th-rate");
+  if (rateBadge) rateBadge.innerText = `${rate}%`;
+  if (thRate) thRate.innerText = rate;
+
+  if (shouldSync) {
+    saveAllAndSync();
+  }
+}
+
+// ================= MÓDULO 1: RENDERIZADO DE TASACIONES & FILTROS =================
 function setStatusFilter(status) {
   appState.activeFilter = status;
-  document.querySelectorAll(".filter-pill").forEach(pill => {
+  document.querySelectorAll(".filter-pill[data-filter]").forEach(pill => {
     pill.classList.toggle("active", pill.dataset.filter === status);
   });
   renderLeads();
@@ -455,10 +943,55 @@ function setOperatorFilter(op) {
   renderLeads();
 }
 
+function quickChangeLeadStatus(leadId, newStatus) {
+  const lead = appState.leads.find(l => l.id === leadId);
+  if (!lead) return;
+
+  lead.status = newStatus;
+  if (newStatus === "FINALIZADO" && !lead.completedAt) {
+    lead.completedAt = getTodayISO();
+  } else if (newStatus !== "FINALIZADO") {
+    lead.completedAt = "";
+  }
+
+  // Asegurar que si no tenía monto calculado, se calcule con los servicios solicitados
+  if (!lead.quotedTotal || lead.quotedTotal === 0) {
+    const ids = lead.quotedServices && lead.quotedServices.length ? lead.quotedServices : detectServicesFromLead(lead);
+    lead.quotedServices = ids;
+    lead.quotedTotal = ids.reduce((acc, id) => {
+      const t = appState.tariffs.find(x => x.id === id);
+      return acc + (t && t.prices ? (t.prices[lead.category || "chico"] || 0) : 0);
+    }, 0);
+  }
+
+  saveAllAndSync();
+  renderAllViews();
+
+  if (newStatus === "FINALIZADO" && lead.assignedTo === "Maximiliano") {
+    const rate = Number(appState.config.commissionRate) || 30;
+    const comm = Math.round((lead.quotedTotal || 0) * (rate / 100));
+    showToast(`✅ Trabajo Completado • Comisión Maxi (${formatUYU(comm)}) generada`);
+  } else {
+    showToast(`Estado actualizado a: ${getStatusPlainText(newStatus)}`);
+  }
+}
+
+function getStatusPlainText(status) {
+  switch (status) {
+    case "NUEVO": return "Por Cotizar";
+    case "COTIZADO": return "Presupuesto Enviado";
+    case "TURNO": return "Turno Agendado";
+    case "FINALIZADO": return "Trabajo Completado";
+    case "CANCELADO": return "Cancelado";
+    default: return status;
+  }
+}
+
 function renderLeads() {
   const container = document.getElementById("leads-container");
   const emptyState = document.getElementById("empty-state");
-  const searchInput = document.getElementById("search-input").value.toLowerCase().trim();
+  const searchEl = document.getElementById("search-input");
+  const searchInput = searchEl ? searchEl.value.toLowerCase().trim() : "";
 
   if (!container) return;
 
@@ -467,10 +1000,10 @@ function renderLeads() {
     if (appState.activeOpFilter !== "ALL" && lead.assignedTo !== appState.activeOpFilter) return false;
 
     if (searchInput) {
-      const matchName = lead.name.toLowerCase().includes(searchInput);
-      const matchVehicle = lead.vehicle.toLowerCase().includes(searchInput);
-      const matchPhone = lead.phone.toLowerCase().includes(searchInput);
-      const matchServices = lead.requestedServices.join(" ").toLowerCase().includes(searchInput);
+      const matchName = (lead.name || "").toLowerCase().includes(searchInput);
+      const matchVehicle = (lead.vehicle || "").toLowerCase().includes(searchInput);
+      const matchPhone = (lead.phone || "").toLowerCase().includes(searchInput);
+      const matchServices = (lead.requestedServices || []).join(" ").toLowerCase().includes(searchInput);
       if (!matchName && !matchVehicle && !matchPhone && !matchServices) return false;
     }
 
@@ -479,39 +1012,42 @@ function renderLeads() {
 
   if (filtered.length === 0) {
     container.innerHTML = "";
-    emptyState.classList.remove("hidden");
+    if (emptyState) emptyState.classList.remove("hidden");
     return;
   }
 
-  emptyState.classList.add("hidden");
+  if (emptyState) emptyState.classList.add("hidden");
 
   container.innerHTML = filtered.map(lead => {
     const isNew = lead.status === "NUEVO";
-    const statusBadge = getStatusBadge(lead.status);
     const categoryBadge = getCategoryBadge(lead.category);
 
     return `
       <div class="lead-card rounded-2xl p-4 flex flex-col justify-between gap-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all">
         
-        <!-- Header Tarjeta -->
         <div>
           <div class="flex items-start justify-between gap-2 mb-2">
             <div>
               <div class="flex items-center gap-1.5 mb-0.5">
-                <span class="text-[9px] font-display font-bold uppercase tracking-wider px-1.5 py-0.2 rounded ${lead.source && lead.source.includes('Presencial') ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
+                <span class="text-[9px] font-display font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${lead.source && lead.source.includes('Presencial') ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
                   ${lead.source && lead.source.includes('Presencial') ? '🏬 Taller' : '📋 Form'}
                 </span>
                 ${isNew ? '<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>' : ''}
               </div>
-              <h3 class="font-display font-bold text-slate-900 text-sm">
-                ${lead.name}
-              </h3>
+              <h3 class="font-display font-bold text-slate-900 text-sm">${lead.name}</h3>
               <p class="text-[11px] font-mono text-slate-500 mt-0.5">${formatPhoneForDisplay(lead.phone)}</p>
             </div>
-            ${statusBadge}
+
+            <!-- Selector rápido de estado directo en la tarjeta -->
+            <select onchange="quickChangeLeadStatus('${lead.id}', this.value)" class="text-[10px] font-display font-extrabold rounded-lg px-2 py-1 border cursor-pointer focus:outline-none ${getStatusSelectClasses(lead.status)}">
+              <option value="NUEVO" ${lead.status === 'NUEVO' ? 'selected' : ''}>🟡 Por Cotizar</option>
+              <option value="COTIZADO" ${lead.status === 'COTIZADO' ? 'selected' : ''}>🟣 Cotizado</option>
+              <option value="TURNO" ${lead.status === 'TURNO' ? 'selected' : ''}>🟢 Turno</option>
+              <option value="FINALIZADO" ${lead.status === 'FINALIZADO' ? 'selected' : ''}>✅ Completado</option>
+              <option value="CANCELADO" ${lead.status === 'CANCELADO' ? 'selected' : ''}>⚪ Cancelado</option>
+            </select>
           </div>
 
-          <!-- Info Vehículo -->
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 my-2">
             <div class="flex items-center justify-between gap-2 text-xs">
               <span class="font-serif font-bold text-slate-900 truncate text-sm">${lead.vehicle}</span>
@@ -524,11 +1060,10 @@ function renderLeads() {
             ` : ''}
           </div>
 
-          <!-- Chips de Servicios Solicitados -->
           <div class="space-y-1 mt-2">
-            <span class="text-[9px] font-display uppercase font-extrabold text-slate-400 tracking-wider">Servicios solicitados:</span>
+            <span class="text-[9px] font-display uppercase font-extrabold text-slate-400 tracking-wider">Servicios:</span>
             <div class="flex flex-wrap gap-1">
-              ${lead.requestedServices.map(s => `
+              ${(lead.requestedServices || []).map(s => `
                 <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-sans text-slate-800 font-medium">
                   ${cleanServiceName(s)}
                 </span>
@@ -537,21 +1072,17 @@ function renderLeads() {
           </div>
         </div>
 
-        <!-- Footer Tarjeta -->
         <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-          
           <div class="flex items-center gap-2 text-[11px] font-display">
             <span class="w-2 h-2 rounded-full ${lead.assignedTo === 'Romina' ? 'bg-[#E11D48]' : 'bg-slate-900'}"></span>
-            <span class="font-bold text-slate-700">${lead.assignedTo || 'Sin asignar'}</span>
-            ${lead.quotedTotal > 0 ? `<span class="font-serif font-black text-slate-900 ml-1 text-sm">$${lead.quotedTotal.toLocaleString('es-UY')}</span>` : ''}
+            <span class="font-bold text-slate-700">${lead.assignedTo || 'Maximiliano'}</span>
+            ${lead.quotedTotal > 0 ? `<span class="font-serif font-black text-slate-900 ml-1 text-sm">${formatUYU(lead.quotedTotal)}</span>` : ''}
           </div>
 
-          <!-- Botón de Acción dinámico -->
           <button onclick="openModalCotizador('${lead.id}')" class="btn-action-primary px-3.5 py-1.5 active:scale-95 font-display font-extrabold text-xs rounded-xl flex items-center gap-1.5 transition">
             <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
-            <span>${lead.quotedTotal > 0 ? 'Ver Cotización' : 'Cotizar'}</span>
+            <span>${lead.quotedTotal > 0 ? 'Ver / Editar' : 'Cotizar'}</span>
           </button>
-
         </div>
 
       </div>
@@ -561,25 +1092,19 @@ function renderLeads() {
   lucide.createIcons();
 }
 
-function cleanServiceName(name) {
-  return name.replace(/\([^)]*\)/g, "").trim();
+function getStatusSelectClasses(status) {
+  switch (status) {
+    case "NUEVO": return "bg-amber-50 text-amber-900 border-amber-300";
+    case "COTIZADO": return "bg-purple-50 text-purple-900 border-purple-300";
+    case "TURNO": return "bg-emerald-50 text-emerald-900 border-emerald-300";
+    case "FINALIZADO": return "bg-slate-900 text-white border-slate-900";
+    case "CANCELADO": return "bg-slate-100 text-slate-500 border-slate-200";
+    default: return "bg-slate-100 text-slate-800 border-slate-200";
+  }
 }
 
-function getStatusBadge(status) {
-  switch (status) {
-    case "NUEVO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-amber-50 text-amber-800 border border-amber-200">Por Cotizar</span>`;
-    case "COTIZADO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-purple-50 text-purple-800 border border-purple-200">Cotizado</span>`;
-    case "TURNO":
-      return `<span class="brand-badge px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest font-black shadow-sm">Turno Agendado</span>`;
-    case "FINALIZADO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-slate-100 text-slate-700 border border-slate-200">Finalizado</span>`;
-    case "CANCELADO":
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest bg-slate-100 text-slate-400 border border-slate-200">Cancelado</span>`;
-    default:
-      return `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-bold uppercase bg-slate-100 text-slate-700">${status}</span>`;
-  }
+function cleanServiceName(name) {
+  return String(name || "").replace(/\([^)]*\)/g, "").trim();
 }
 
 function getCategoryBadge(cat) {
@@ -592,28 +1117,846 @@ function updateStats() {
   const nuevos = appState.leads.filter(l => l.status === "NUEVO").length;
   const cotizados = appState.leads.filter(l => l.status === "COTIZADO").length;
   const turnos = appState.leads.filter(l => l.status === "TURNO").length;
-  const totalMonto = appState.leads.reduce((acc, curr) => acc + (curr.quotedTotal || 0), 0);
+  const totalMonto = appState.leads.reduce((acc, curr) => acc + (Number(curr.quotedTotal) || 0), 0);
 
-  document.getElementById("stat-total").innerText = total;
-  document.getElementById("stat-nuevos").innerText = nuevos;
-  document.getElementById("stat-cotizados").innerText = cotizados;
-  document.getElementById("stat-turnos").innerText = turnos;
-  document.getElementById("stat-monto").innerText = "$" + totalMonto.toLocaleString("es-UY");
+  const elTotal = document.getElementById("stat-total");
+  const elNuevos = document.getElementById("stat-nuevos");
+  const elCotizados = document.getElementById("stat-cotizados");
+  const elTurnos = document.getElementById("stat-turnos");
+  const elMonto = document.getElementById("stat-monto");
+
+  if (elTotal) elTotal.innerText = total;
+  if (elNuevos) elNuevos.innerText = nuevos;
+  if (elCotizados) elCotizados.innerText = cotizados;
+  if (elTurnos) elTurnos.innerText = turnos;
+  if (elMonto) elMonto.innerText = formatUYU(totalMonto);
+}
+
+// ================= MÓDULO 2: DASHBOARD FINANCIERO & OPERATIVO =================
+function renderDashboard() {
+  const filterEl = document.getElementById("dashboard-month-filter");
+  const selectedMonth = filterEl ? filterEl.value : getCurrentYearMonth();
+
+  // 1. Filtrar trabajos completados del período
+  const completedLeads = appState.leads.filter(l => {
+    if (l.status !== "FINALIZADO") return false;
+    if (selectedMonth === "ALL") return true;
+    const ym = extractYearMonthFromDateStr(l.completedAt || l.timestamp);
+    return ym === selectedMonth;
+  });
+
+  // 2. Filtrar gastos del período
+  const periodExpenses = appState.expenses.filter(e => {
+    if (selectedMonth === "ALL") return true;
+    return extractYearMonthFromDateStr(e.date) === selectedMonth;
+  });
+
+  // 3. Filtrar comisiones del período
+  const periodCommissions = appState.commissions.filter(c => {
+    if (selectedMonth === "ALL") return true;
+    return extractYearMonthFromDateStr(c.date) === selectedMonth;
+  });
+
+  const totalIncome = completedLeads.reduce((sum, l) => sum + (Number(l.quotedTotal) || 0), 0);
+  const totalExpenses = periodExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  const totalCommissions = periodCommissions.reduce((sum, c) => sum + (Number(c.commissionAmount) || 0), 0);
+  const pendingCommissions = periodCommissions.filter(c => c.status !== "PAGADA").reduce((sum, c) => sum + (Number(c.commissionAmount) || 0), 0);
+
+  // Resultado Neto = Ingresos - Gastos - Comisiones
+  const netResult = totalIncome - totalExpenses - totalCommissions;
+  const jobsCount = completedLeads.length;
+  const avgTicket = jobsCount > 0 ? Math.round(totalIncome / jobsCount) : 0;
+
+  const totalStockValue = appState.stock.reduce((sum, item) => sum + ((Number(item.quantity) || 0) * (Number(item.unitCost) || 0)), 0);
+  const lowStockItems = appState.stock.filter(item => Number(item.quantity) <= Number(item.minStock));
+
+  // Pintar KPIs
+  setText("dash-income", formatUYU(totalIncome));
+  setText("dash-income-sub", `${jobsCount} trabajo${jobsCount === 1 ? "" : "s"} completado${jobsCount === 1 ? "" : "s"}`);
+  setText("dash-expenses", formatUYU(totalExpenses));
+  setText("dash-expenses-sub", `${periodExpenses.length} gasto${periodExpenses.length === 1 ? "" : "s"} registrado${periodExpenses.length === 1 ? "" : "s"}`);
+  setText("dash-commissions", formatUYU(totalCommissions));
+  setText("dash-commissions-sub", `Pendientes de pago: ${formatUYU(pendingCommissions)}`);
+
+  const netEl = document.getElementById("dash-net");
+  if (netEl) {
+    netEl.innerText = (netResult < 0 ? "-" : "") + formatUYU(Math.abs(netResult));
+    netEl.className = `font-serif text-2xl sm:text-3xl font-black ${netResult >= 0 ? "text-emerald-700" : "text-red-600"}`;
+  }
+
+  setText("dash-jobs-count", jobsCount);
+  setText("dash-avg-ticket", formatUYU(avgTicket));
+  setText("dash-stock-value", formatUYU(totalStockValue));
+  setText("dash-low-stock-count", lowStockItems.length);
+
+  // Renderizar Gráfico de últimos 6 meses
+  renderSixMonthChart();
+
+  // Renderizar Servicios Más Vendidos del período
+  renderTopServices(completedLeads);
+
+  // Renderizar Alertas de Stock Bajo
+  renderDashboardLowStock(lowStockItems);
+}
+
+function renderSixMonthChart() {
+  const container = document.getElementById("dash-chart-6m");
+  if (!container) return;
+
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const shortNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    months.push({
+      ym,
+      label: `${shortNames[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`
+    });
+  }
+
+  const statsPerMonth = months.map(m => {
+    const inc = appState.leads
+      .filter(l => l.status === "FINALIZADO" && extractYearMonthFromDateStr(l.completedAt || l.timestamp) === m.ym)
+      .reduce((s, l) => s + (Number(l.quotedTotal) || 0), 0);
+
+    const exp = appState.expenses
+      .filter(e => extractYearMonthFromDateStr(e.date) === m.ym)
+      .reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
+    const com = appState.commissions
+      .filter(c => extractYearMonthFromDateStr(c.date) === m.ym)
+      .reduce((s, c) => s + (Number(c.commissionAmount) || 0), 0);
+
+    return { ...m, income: inc, outgoings: exp + com };
+  });
+
+  const maxVal = Math.max(10000, ...statsPerMonth.flatMap(x => [x.income, x.outgoings]));
+
+  container.innerHTML = statsPerMonth.map(m => {
+    const incPct = Math.max(4, Math.round((m.income / maxVal) * 100));
+    const outPct = Math.max(4, Math.round((m.outgoings / maxVal) * 100));
+
+    return `
+      <div class="flex-1 flex flex-col items-center h-full justify-end group">
+        <div class="text-[9px] font-mono font-bold text-slate-600 mb-1 text-center leading-tight">
+          <div class="text-slate-900">${m.income > 0 ? formatUYU(m.income) : "$0"}</div>
+          <div class="text-slate-400">${m.outgoings > 0 ? formatUYU(m.outgoings) : "$0"}</div>
+        </div>
+        <div class="w-full max-w-[54px] flex items-end justify-center gap-1.5 h-36">
+          <div class="w-1/2 rounded-t-lg chart-bar-income" style="height: ${incPct}%" title="Ingresos ${m.label}: ${formatUYU(m.income)}"></div>
+          <div class="w-1/2 rounded-t-lg chart-bar-expense" style="height: ${outPct}%" title="Gastos + Comisiones ${m.label}: ${formatUYU(m.outgoings)}"></div>
+        </div>
+        <div class="text-[10px] font-display font-bold text-slate-700 mt-2">${m.label}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderTopServices(completedLeads) {
+  const container = document.getElementById("dash-top-services");
+  if (!container) return;
+
+  const counts = {};
+  completedLeads.forEach(lead => {
+    const serviceIds = (lead.quotedServices && lead.quotedServices.length > 0)
+      ? lead.quotedServices
+      : detectServicesFromLead(lead);
+
+    serviceIds.forEach(id => {
+      const tariff = appState.tariffs.find(t => t.id === id);
+      const name = tariff ? tariff.shortName : cleanServiceName(id);
+      const price = tariff && tariff.prices ? (tariff.prices[lead.category || "chico"] || 0) : 0;
+      if (!counts[name]) counts[name] = { count: 0, revenue: 0 };
+      counts[name].count += 1;
+      counts[name].revenue += price;
+    });
+  });
+
+  const sorted = Object.entries(counts)
+    .map(([name, data]) => ({ name, ...data }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  if (sorted.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-slate-400 text-xs">
+        No hay servicios en estado "✅ Trabajo Completado" para este período.
+      </div>
+    `;
+    return;
+  }
+
+  const maxCount = Math.max(1, sorted[0].count);
+
+  container.innerHTML = sorted.map(item => {
+    const pct = Math.round((item.count / maxCount) * 100);
+    return `
+      <div class="space-y-1">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-display font-bold text-slate-900 truncate pr-2">${item.name}</span>
+          <span class="font-mono font-bold text-slate-700 shrink-0">${item.count}x • ${formatUYU(item.revenue)}</span>
+        </div>
+        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="h-full chart-bar-income rounded-full" style="width: ${pct}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderDashboardLowStock(lowStockItems) {
+  const container = document.getElementById("dash-low-stock-list");
+  if (!container) return;
+
+  if (lowStockItems.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-xs text-emerald-900 font-display font-bold flex items-center gap-2">
+        <span>✅ Todo el inventario está por encima del stock mínimo.</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = lowStockItems.map(item => {
+    const isZero = Number(item.quantity) <= 0;
+    return `
+      <div class="p-3.5 rounded-xl border ${isZero ? "bg-red-50 border-red-300" : "bg-amber-50 border-amber-300"} flex items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-display font-extrabold uppercase ${isZero ? "bg-red-600 text-white" : "bg-amber-500 text-white"}">
+              ${isZero ? "SIN STOCK" : "STOCK BAJO"}
+            </span>
+            <span class="text-[10px] font-display text-slate-600">${item.category}</span>
+          </div>
+          <div class="font-display font-bold text-slate-900 text-xs mt-1">${item.name}</div>
+          <div class="text-[11px] font-mono text-slate-700">
+            Quedan: <strong>${item.quantity} ${item.unit}</strong> (Mín: ${item.minStock})
+          </div>
+        </div>
+        <button onclick="openStockMovementModal('${item.id}', 'ENTRADA')" class="px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[11px] font-display font-bold shrink-0 hover:bg-slate-800">
+          + Reponer
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+// ================= MÓDULO 3: CONTROL DE STOCK (100% MANUAL) =================
+function setStockCategoryFilter(cat) {
+  appState.activeStockCatFilter = cat;
+  document.querySelectorAll(".stock-cat-pill").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.stockCat === cat);
+  });
+  renderStock();
+}
+
+function renderStock() {
+  const container = document.getElementById("stock-container");
+  const movTbody = document.getElementById("stock-movements-tbody");
+  if (!container) return;
+
+  const totalValue = appState.stock.reduce((acc, item) => acc + ((Number(item.quantity) || 0) * (Number(item.unitCost) || 0)), 0);
+  const alertCount = appState.stock.filter(item => Number(item.quantity) <= Number(item.minStock)).length;
+
+  setText("stock-total-value", formatUYU(totalValue));
+  setText("stock-total-items", appState.stock.length);
+  setText("stock-alert-count", alertCount);
+
+  const searchEl = document.getElementById("stock-search-input");
+  const q = searchEl ? searchEl.value.toLowerCase().trim() : "";
+
+  const filtered = appState.stock.filter(item => {
+    if (appState.activeStockCatFilter === "LOW") {
+      if (Number(item.quantity) > Number(item.minStock)) return false;
+    } else if (appState.activeStockCatFilter !== "ALL" && item.category !== appState.activeStockCatFilter) {
+      return false;
+    }
+
+    if (q) {
+      const matchName = (item.name || "").toLowerCase().includes(q);
+      const matchSup = (item.supplier || "").toLowerCase().includes(q);
+      const matchCat = (item.category || "").toLowerCase().includes(q);
+      if (!matchName && !matchSup && !matchCat) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-10 text-center text-xs text-slate-500">
+        No se encontraron productos con ese criterio.
+      </div>
+    `;
+  } else {
+    container.innerHTML = filtered.map(item => {
+      const qty = Number(item.quantity) || 0;
+      const min = Number(item.minStock) || 0;
+      const cost = Number(item.unitCost) || 0;
+      const val = qty * cost;
+
+      const isCritical = qty <= 0;
+      const isLow = !isCritical && qty <= min;
+
+      let alertClass = "";
+      let badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">🟢 Óptimo</span>`;
+
+      if (isCritical) {
+        alertClass = "stock-card-critical";
+        badgeHtml = `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase bg-red-600 text-white shadow-sm">🔴 Sin Stock</span>`;
+      } else if (isLow) {
+        alertClass = "stock-card-warning";
+        badgeHtml = `<span class="px-2.5 py-0.5 rounded-full text-[9px] font-display font-extrabold uppercase bg-amber-500 text-white shadow-sm">⚠️ Stock Bajo</span>`;
+      }
+
+      return `
+        <div class="lead-card ${alertClass} rounded-2xl p-4 flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-[9px] font-display font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">${item.category}</span>
+                <h4 class="font-display font-bold text-slate-900 text-sm mt-1.5">${item.name}</h4>
+                ${item.supplier ? `<p class="text-[11px] text-slate-500">Proveedor: ${item.supplier}</p>` : ""}
+              </div>
+              ${badgeHtml}
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 my-3 grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div class="text-[9px] font-display font-bold uppercase text-slate-400">Disponible</div>
+                <div class="font-mono font-black text-base ${isCritical ? 'text-red-600' : isLow ? 'text-amber-700' : 'text-slate-900'}">${qty} <span class="text-[10px] font-normal">${item.unit}</span></div>
+              </div>
+              <div class="border-x border-slate-200">
+                <div class="text-[9px] font-display font-bold uppercase text-slate-400">Mínimo</div>
+                <div class="font-mono font-bold text-xs text-slate-700 mt-0.5">${min} ${item.unit}</div>
+              </div>
+              <div>
+                <div class="text-[9px] font-display font-bold uppercase text-slate-400">Valor Stock</div>
+                <div class="font-mono font-bold text-xs text-slate-900 mt-0.5">${formatUYU(val)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 pt-1">
+            <!-- Botones rápidos + Entrada y - Salida -->
+            <div class="flex items-center gap-1.5 flex-1">
+              <button onclick="openStockMovementModal('${item.id}', 'ENTRADA')" class="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-1 shadow-sm transition">
+                <span>+ Entrada</span>
+              </button>
+              <button onclick="openStockMovementModal('${item.id}', 'SALIDA')" class="flex-1 py-2 px-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-1 shadow-sm transition">
+                <span>– Salida</span>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button onclick="openStockProductModal('${item.id}')" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl" title="Editar producto">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="confirmDeleteStockProduct('${item.id}')" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl" title="Eliminar producto">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // Renderizar Historial de Movimientos
+  if (movTbody) {
+    if (appState.stockMovements.length === 0) {
+      movTbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Sin movimientos registrados todavía.</td></tr>`;
+    } else {
+      movTbody.innerHTML = appState.stockMovements.slice(0, 40).map(m => {
+        const isIn = m.type === "ENTRADA";
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${m.date || "-"}</td>
+            <td class="py-2.5 px-3 font-display font-bold text-slate-900">${m.productName}</td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-display font-extrabold ${isIn ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-800 border border-amber-200"}">
+                ${isIn ? "+ Entrada" : "– Salida"}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 font-mono font-bold ${isIn ? "text-emerald-700" : "text-slate-900"}">
+              ${isIn ? "+" : "-"}${m.quantity} ${m.unit || ""}
+            </td>
+            <td class="py-2.5 px-3 font-display font-bold text-slate-700">${m.operator || "Maximiliano"}</td>
+            <td class="py-2.5 px-3 text-slate-500">${m.note || "-"}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+  }
+
+  lucide.createIcons();
+}
+
+function openStockProductModal(productId = null) {
+  const modal = document.getElementById("modal-stock-product");
+  const title = document.getElementById("stock-product-modal-title");
+
+  if (productId) {
+    const item = appState.stock.find(x => x.id === productId);
+    if (!item) return;
+    title.innerText = "Editar Producto de Stock";
+    document.getElementById("stock-item-id").value = item.id;
+    document.getElementById("stock-item-name").value = item.name;
+    document.getElementById("stock-item-category").value = item.category;
+    document.getElementById("stock-item-unit").value = item.unit;
+    document.getElementById("stock-item-qty").value = item.quantity;
+    document.getElementById("stock-item-min").value = item.minStock;
+    document.getElementById("stock-item-cost").value = item.unitCost;
+    document.getElementById("stock-item-supplier").value = item.supplier || "";
+  } else {
+    title.innerText = "Alta de Producto en Stock";
+    document.getElementById("stock-item-id").value = "";
+    document.getElementById("stock-item-name").value = "";
+    document.getElementById("stock-item-category").value = "Químicos";
+    document.getElementById("stock-item-unit").value = "litros";
+    document.getElementById("stock-item-qty").value = "";
+    document.getElementById("stock-item-min").value = "1";
+    document.getElementById("stock-item-cost").value = "";
+    document.getElementById("stock-item-supplier").value = "";
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function closeStockProductModal() {
+  document.getElementById("modal-stock-product").classList.add("hidden");
+}
+
+function saveStockProduct(e) {
+  e.preventDefault();
+  const id = document.getElementById("stock-item-id").value;
+  const name = document.getElementById("stock-item-name").value.trim();
+  const category = document.getElementById("stock-item-category").value;
+  const unit = document.getElementById("stock-item-unit").value;
+  const quantity = parseFloat(document.getElementById("stock-item-qty").value) || 0;
+  const minStock = parseFloat(document.getElementById("stock-item-min").value) || 0;
+  const unitCost = parseFloat(document.getElementById("stock-item-cost").value) || 0;
+  const supplier = document.getElementById("stock-item-supplier").value.trim();
+
+  if (id) {
+    const existing = appState.stock.find(x => x.id === id);
+    if (existing) {
+      existing.name = name;
+      existing.category = category;
+      existing.unit = unit;
+      existing.quantity = quantity;
+      existing.minStock = minStock;
+      existing.unitCost = unitCost;
+      existing.supplier = supplier;
+      existing.updatedAt = getTodayISO();
+    }
+    showToast("Producto actualizado");
+  } else {
+    const newItem = {
+      id: "stk-" + Date.now(),
+      name,
+      category,
+      unit,
+      quantity,
+      minStock,
+      unitCost,
+      supplier,
+      updatedAt: getTodayISO()
+    };
+    appState.stock.unshift(newItem);
+    appState.stockMovements.unshift({
+      id: "mov-" + Date.now(),
+      date: new Date().toLocaleString("es-UY"),
+      productId: newItem.id,
+      productName: newItem.name,
+      type: "ENTRADA",
+      quantity: quantity,
+      unit: unit,
+      operator: appState.config.activeUser,
+      note: "Alta inicial de producto"
+    });
+    showToast("Producto agregado al inventario");
+  }
+
+  closeStockProductModal();
+  saveAllAndSync();
+  renderAllViews();
+}
+
+function openStockMovementModal(productId, type) {
+  const item = appState.stock.find(x => x.id === productId);
+  if (!item) return;
+
+  document.getElementById("stock-move-product-id").value = item.id;
+  document.getElementById("stock-move-type").value = type;
+  document.getElementById("stock-move-title").innerText = type === "ENTRADA" ? "+ Entrada de Stock" : "– Salida de Stock";
+  document.getElementById("stock-move-subtitle").innerText = `${item.name} (${formatUYU(item.unitCost)} / ${item.unit})`;
+  document.getElementById("stock-move-unit-label").innerText = item.unit;
+  document.getElementById("stock-move-current-qty").innerText = `${item.quantity} ${item.unit}`;
+  document.getElementById("stock-move-qty").value = "1";
+  document.getElementById("stock-move-note").value = "";
+
+  const expenseBox = document.getElementById("stock-move-expense-box");
+  const alsoExpenseCheck = document.getElementById("stock-move-also-expense");
+
+  if (type === "ENTRADA" && Number(item.unitCost) > 0) {
+    expenseBox.classList.remove("hidden");
+    alsoExpenseCheck.checked = false;
+    toggleMoveExpenseMethod();
+    updateStockMoveCostPreview();
+  } else {
+    expenseBox.classList.add("hidden");
+    alsoExpenseCheck.checked = false;
+  }
+
+  document.getElementById("modal-stock-movement").classList.remove("hidden");
+  setTimeout(() => {
+    const qtyInput = document.getElementById("stock-move-qty");
+    if (qtyInput) {
+      qtyInput.focus();
+      qtyInput.select();
+    }
+  }, 80);
+}
+
+function closeStockMovementModal() {
+  document.getElementById("modal-stock-movement").classList.add("hidden");
+}
+
+function adjustMoveQty(delta) {
+  const input = document.getElementById("stock-move-qty");
+  const curr = parseFloat(input.value) || 0;
+  input.value = Math.max(0.1, Math.round((curr + delta) * 10) / 10);
+  updateStockMoveCostPreview();
+}
+
+function toggleMoveExpenseMethod() {
+  const checked = document.getElementById("stock-move-also-expense").checked;
+  const wrap = document.getElementById("stock-move-payment-wrap");
+  if (wrap) wrap.classList.toggle("hidden", !checked);
+}
+
+function updateStockMoveCostPreview() {
+  const productId = document.getElementById("stock-move-product-id").value;
+  const item = appState.stock.find(x => x.id === productId);
+  if (!item) return;
+  const qty = parseFloat(document.getElementById("stock-move-qty").value) || 0;
+  const totalCost = Math.round(qty * (Number(item.unitCost) || 0));
+  const preview = document.getElementById("stock-move-expense-preview");
+  if (preview) preview.innerText = `Costo calculado: ${formatUYU(totalCost)} UYU`;
+}
+
+function submitStockMovement(e) {
+  e.preventDefault();
+  const productId = document.getElementById("stock-move-product-id").value;
+  const type = document.getElementById("stock-move-type").value;
+  const qty = parseFloat(document.getElementById("stock-move-qty").value) || 0;
+  const note = document.getElementById("stock-move-note").value.trim();
+
+  const item = appState.stock.find(x => x.id === productId);
+  if (!item || qty <= 0) return;
+
+  if (type === "ENTRADA") {
+    item.quantity = Math.round((Number(item.quantity) + qty) * 100) / 100;
+  } else {
+    item.quantity = Math.max(0, Math.round((Number(item.quantity) - qty) * 100) / 100);
+  }
+  item.updatedAt = getTodayISO();
+
+  appState.stockMovements.unshift({
+    id: "mov-" + Date.now(),
+    date: new Date().toLocaleString("es-UY"),
+    productId: item.id,
+    productName: item.name,
+    type,
+    quantity: qty,
+    unit: item.unit,
+    operator: appState.config.activeUser,
+    note: note || (type === "ENTRADA" ? "Reposición de stock" : "Consumo en taller")
+  });
+
+  // Si es ENTRADA y pidió cargarlo también como gasto en categoría Insumos
+  const alsoExpense = document.getElementById("stock-move-also-expense").checked;
+  if (type === "ENTRADA" && alsoExpense && Number(item.unitCost) > 0) {
+    const totalExpense = Math.round(qty * Number(item.unitCost));
+    const paymentMethod = document.getElementById("stock-move-payment").value || "Efectivo";
+    appState.expenses.unshift({
+      id: "exp-" + Date.now(),
+      date: getTodayISO(),
+      amount: totalExpense,
+      category: "Insumos",
+      description: `Compra Stock: ${qty} ${item.unit} de ${item.name}${note ? " (" + note + ")" : ""}`,
+      paymentMethod,
+      operator: appState.config.activeUser
+    });
+    showToast(`Stock actualizado y Gasto de ${formatUYU(totalExpense)} registrado en Insumos`);
+  } else {
+    showToast(`Movimiento registrado (${type === "ENTRADA" ? "+" : "-"}${qty} ${item.unit})`);
+  }
+
+  closeStockMovementModal();
+  saveAllAndSync();
+  renderAllViews();
+}
+
+function confirmDeleteStockProduct(productId) {
+  const item = appState.stock.find(x => x.id === productId);
+  if (!item) return;
+
+  openConfirmDeleteModal(
+    `¿Eliminar "${item.name}"?`,
+    "Se quitará este producto del inventario de DetailVlak.",
+    () => {
+      appState.stock = appState.stock.filter(x => x.id !== productId);
+      saveAllAndSync();
+      renderAllViews();
+      showToast("Producto eliminado del stock");
+    }
+  );
+}
+
+// ================= MÓDULO 4: CONTROL DE GASTOS =================
+function handleQuickExpenseSubmit(e) {
+  e.preventDefault();
+  const date = document.getElementById("exp-date").value || getTodayISO();
+  const amount = parseFloat(document.getElementById("exp-amount").value) || 0;
+  const category = document.getElementById("exp-category").value;
+  const paymentMethod = document.getElementById("exp-payment").value;
+  const description = document.getElementById("exp-desc").value.trim();
+
+  if (amount <= 0 || !description) return;
+
+  appState.expenses.unshift({
+    id: "exp-" + Date.now(),
+    date,
+    amount: Math.round(amount),
+    category,
+    description,
+    paymentMethod,
+    operator: appState.config.activeUser
+  });
+
+  document.getElementById("exp-amount").value = "";
+  document.getElementById("exp-desc").value = "";
+
+  populateMonthSelectors();
+  saveAllAndSync();
+  renderAllViews();
+  showToast(`Gasto de ${formatUYU(amount)} guardado`);
+}
+
+function renderExpenses() {
+  const tbody = document.getElementById("expenses-tbody");
+  if (!tbody) return;
+
+  const monthFilter = document.getElementById("exp-filter-month")?.value || getCurrentYearMonth();
+  const catFilter = document.getElementById("exp-filter-category")?.value || "ALL";
+
+  const filtered = appState.expenses.filter(exp => {
+    if (monthFilter !== "ALL" && extractYearMonthFromDateStr(exp.date) !== monthFilter) return false;
+    if (catFilter !== "ALL" && exp.category !== catFilter) return false;
+    return true;
+  });
+
+  const totalPeriod = filtered.reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
+  setText("exp-period-total", formatUYU(totalPeriod));
+  setText("exp-period-count", `${filtered.length} registro${filtered.length === 1 ? "" : "s"}`);
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No hay gastos registrados en este período.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(exp => `
+    <tr class="hover:bg-slate-50 transition-colors">
+      <td class="py-3 px-4 font-mono text-slate-600">${formatReadableDate(exp.date)}</td>
+      <td class="py-3 px-4">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-display font-bold bg-slate-100 text-slate-800 border border-slate-200">
+          ${exp.category}
+        </span>
+      </td>
+      <td class="py-3 px-4 font-display font-bold text-slate-900">${exp.description}</td>
+      <td class="py-3 px-4 text-slate-600">${exp.paymentMethod || "Efectivo"}</td>
+      <td class="py-3 px-4 font-display text-slate-700">${exp.operator || "Maximiliano"}</td>
+      <td class="py-3 px-4 text-right font-serif font-black text-slate-900 text-sm">${formatUYU(exp.amount)}</td>
+      <td class="py-3 px-4 text-center">
+        <div class="inline-flex items-center gap-1">
+          <button onclick="openExpenseEditModal('${exp.id}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg" title="Editar">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          </button>
+          <button onclick="confirmDeleteExpense('${exp.id}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg" title="Eliminar">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+
+  lucide.createIcons();
+}
+
+function openExpenseEditModal(expId) {
+  const exp = appState.expenses.find(x => x.id === expId);
+  if (!exp) return;
+
+  document.getElementById("edit-exp-id").value = exp.id;
+  document.getElementById("edit-exp-date").value = exp.date;
+  document.getElementById("edit-exp-amount").value = exp.amount;
+  document.getElementById("edit-exp-category").value = exp.category;
+  document.getElementById("edit-exp-payment").value = exp.paymentMethod || "Efectivo";
+  document.getElementById("edit-exp-desc").value = exp.description;
+
+  document.getElementById("modal-expense-edit").classList.remove("hidden");
+}
+
+function closeExpenseEditModal() {
+  document.getElementById("modal-expense-edit").classList.add("hidden");
+}
+
+function saveEditedExpense(e) {
+  e.preventDefault();
+  const id = document.getElementById("edit-exp-id").value;
+  const exp = appState.expenses.find(x => x.id === id);
+  if (!exp) return;
+
+  exp.date = document.getElementById("edit-exp-date").value;
+  exp.amount = Math.round(parseFloat(document.getElementById("edit-exp-amount").value) || 0);
+  exp.category = document.getElementById("edit-exp-category").value;
+  exp.paymentMethod = document.getElementById("edit-exp-payment").value;
+  exp.description = document.getElementById("edit-exp-desc").value.trim();
+
+  closeExpenseEditModal();
+  saveAllAndSync();
+  renderAllViews();
+  showToast("Gasto actualizado");
+}
+
+function confirmDeleteExpense(expId) {
+  const exp = appState.expenses.find(x => x.id === expId);
+  if (!exp) return;
+
+  openConfirmDeleteModal(
+    `¿Eliminar gasto de ${formatUYU(exp.amount)}?`,
+    `Descripción: "${exp.description}" (${formatReadableDate(exp.date)})`,
+    () => {
+      appState.expenses = appState.expenses.filter(x => x.id !== expId);
+      saveAllAndSync();
+      renderAllViews();
+      showToast("Gasto eliminado");
+    }
+  );
+}
+
+// ================= MÓDULO 5: COMISIONES (MAXIMILIANO) =================
+function renderCommissions() {
+  const tbody = document.getElementById("commissions-tbody");
+  if (!tbody) return;
+
+  const monthFilter = document.getElementById("comm-filter-month")?.value || getCurrentYearMonth();
+
+  const filtered = appState.commissions.filter(c => {
+    if (monthFilter === "ALL") return true;
+    return extractYearMonthFromDateStr(c.date) === monthFilter;
+  });
+
+  const totalMonth = filtered.reduce((sum, c) => sum + (Number(c.commissionAmount) || 0), 0);
+  const totalPaid = filtered.filter(c => c.status === "PAGADA").reduce((sum, c) => sum + (Number(c.commissionAmount) || 0), 0);
+  const totalPending = filtered.filter(c => c.status !== "PAGADA").reduce((sum, c) => sum + (Number(c.commissionAmount) || 0), 0);
+
+  setText("comm-total-month", formatUYU(totalMonth));
+  setText("comm-jobs-count", `${filtered.length} trabajo${filtered.length === 1 ? "" : "s"} completado${filtered.length === 1 ? "" : "s"} por Maxi`);
+  setText("comm-total-paid", formatUYU(totalPaid));
+  setText("comm-total-pending", formatUYU(totalPending));
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="py-8 text-center text-slate-400">
+          No hay comisiones generadas en este período. Al marcar una tasación de Maximiliano como "✅ Trabajo Completado", aparecerá automáticamente aquí.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(c => {
+    const isPaid = c.status === "PAGADA";
+    return `
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="py-3 px-4 font-mono text-slate-600">${formatReadableDate(c.date)}</td>
+        <td class="py-3 px-4 font-display font-bold text-slate-900">${c.clientName}</td>
+        <td class="py-3 px-4 font-serif text-slate-800">${c.vehicle}</td>
+        <td class="py-3 px-4 text-right font-mono font-bold text-slate-700">${formatUYU(c.jobTotal)}</td>
+        <td class="py-3 px-4 text-right font-serif font-black text-slate-900 text-sm">${formatUYU(c.commissionAmount)}</td>
+        <td class="py-3 px-4 text-center">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-display font-extrabold uppercase ${isPaid ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-800 border border-amber-300"}">
+            ${isPaid ? "✅ Pagada" : "⏳ Pendiente"}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <button onclick="toggleCommissionPaid('${c.id}')" class="px-3 py-1.5 rounded-xl text-[11px] font-display font-bold transition ${isPaid ? "bg-slate-100 text-slate-600 hover:bg-slate-200" : "btn-action-primary"}">
+            ${isPaid ? "Pasar a Pendiente" : "Marcar Pagada"}
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function toggleCommissionPaid(commId) {
+  const comm = appState.commissions.find(c => c.id === commId);
+  if (!comm) return;
+
+  if (comm.status === "PAGADA") {
+    comm.status = "PENDIENTE";
+    comm.paidAt = "";
+    showToast("Comisión marcada como Pendiente");
+  } else {
+    comm.status = "PAGADA";
+    comm.paidAt = getTodayISO();
+    showToast(`Comisión de ${formatUYU(comm.commissionAmount)} marcada como Pagada`);
+  }
+
+  saveAllAndSync();
+  renderAllViews();
+}
+
+function payAllPendingCommissions() {
+  const monthFilter = document.getElementById("comm-filter-month")?.value || getCurrentYearMonth();
+  let count = 0;
+
+  appState.commissions.forEach(c => {
+    const matchMonth = monthFilter === "ALL" || extractYearMonthFromDateStr(c.date) === monthFilter;
+    if (matchMonth && c.status !== "PAGADA") {
+      c.status = "PAGADA";
+      c.paidAt = getTodayISO();
+      count++;
+    }
+  });
+
+  if (count === 0) {
+    showToast("No hay comisiones pendientes en este período");
+    return;
+  }
+
+  saveAllAndSync();
+  renderAllViews();
+  showToast(`¡${count} comisiones marcadas como Pagadas!`);
 }
 
 // ================= MODAL DE COTIZACIÓN & MOTOR DE TASACIÓN =================
 function openNewManualQuote() {
   const newLead = {
     id: "manual-" + Date.now(),
-    timestamp: new Date().toLocaleString("es-UY"),
+    timestamp: getTodayISO(),
     name: "",
     phone: "",
     vehicle: "",
     color: "",
     category: "chico",
-    requestedServices: ["Limpieza profunda de interiores (Tapizados, alfombras, techo, paneles y desinfección)"],
+    requestedServices: ["Tasación Presencial en Taller"],
     customerNotes: "",
-    preferredDate: "A coordinar",
+    preferredDate: "En el día / A coordinar",
     source: "Presencial / Taller",
     status: "COTIZADO",
     assignedTo: appState.config.activeUser,
@@ -621,7 +1964,7 @@ function openNewManualQuote() {
     quotedTotal: 0,
     discountAmount: 0,
     timeEstimate: "",
-    internalNotes: ""
+    completedAt: ""
   };
 
   appState.currentLead = newLead;
@@ -639,8 +1982,10 @@ function openNewManualQuote() {
   document.getElementById("modal-assigned-operator").value = appState.config.activeUser;
   document.getElementById("modal-lead-source").value = "Presencial / Taller";
   document.getElementById("modal-lead-status").value = "COTIZADO";
-
   document.getElementById("modal-lead-call-btn").href = "#";
+
+  const delBtn = document.getElementById("btn-delete-lead");
+  if (delBtn) delBtn.classList.add("hidden");
 
   renderModalServices();
   recalculateQuote();
@@ -677,6 +2022,9 @@ function openModalCotizador(leadId) {
 
   const cleanPhone = sanitizePhoneForWhatsApp(lead.phone);
   document.getElementById("modal-lead-call-btn").href = cleanPhone ? `tel:${cleanPhone}` : "#";
+
+  const delBtn = document.getElementById("btn-delete-lead");
+  if (delBtn) delBtn.classList.remove("hidden");
 
   renderModalServices();
   recalculateQuote();
@@ -733,7 +2081,7 @@ function renderModalServices() {
         <div class="flex-1">
           <div class="flex items-center justify-between">
             <span class="font-display font-bold text-slate-900 text-xs">${tariff.shortName}</span>
-            <span class="font-serif font-black text-slate-900 text-xs">$${price.toLocaleString('es-UY')}</span>
+            <span class="font-serif font-black text-slate-900 text-xs">${formatUYU(price)}</span>
           </div>
           <p class="font-sans text-[10px] text-slate-500 line-clamp-1 mt-0.5">${tariff.description}</p>
         </div>
@@ -744,10 +2092,9 @@ function renderModalServices() {
 
 function detectServicesFromLead(lead) {
   const matched = [];
-  const reqText = lead.requestedServices.join(" ").toLowerCase();
+  const reqText = (lead.requestedServices || []).join(" ").toLowerCase();
 
   appState.tariffs.forEach(tariff => {
-    const key = tariff.shortName.toLowerCase();
     if (
       (tariff.id === "interior" && (reqText.includes("interior") || reqText.includes("tapizado") || reqText.includes("alfombra"))) ||
       (tariff.id === "cuero" && reqText.includes("cuero")) ||
@@ -769,6 +2116,15 @@ function recalculateQuote() {
   const category = document.getElementById("modal-car-category").value || "chico";
   const checkedBoxes = Array.from(document.querySelectorAll("#modal-services-list input[type='checkbox']:checked"));
   const selectedServiceIds = checkedBoxes.map(cb => cb.value);
+
+  // Actualizar precios en las etiquetas del modal según tamaño
+  document.querySelectorAll("#modal-services-list input[type='checkbox']").forEach(cb => {
+    const t = appState.tariffs.find(x => x.id === cb.value);
+    if (t) {
+      const priceSpan = cb.parentElement.querySelector(".font-serif");
+      if (priceSpan) priceSpan.innerText = formatUYU(t.prices[category] || 0);
+    }
+  });
 
   let subtotal = 0;
   let totalHours = 0;
@@ -813,8 +2169,8 @@ function recalculateQuote() {
   }
 
   document.getElementById("modal-calc-breakdown").innerText =
-    `Subtotal: $${subtotal.toLocaleString('es-UY')} ${discountAmount > 0 ? `(-$${discountAmount.toLocaleString('es-UY')})` : ''} ${surcharge > 0 ? `(+$${surcharge.toLocaleString('es-UY')})` : ''}`;
-  document.getElementById("modal-total-display").innerHTML = `$${total.toLocaleString('es-UY')} <span class="font-sans text-xs text-mono-400 font-medium">UYU</span>`;
+    `Subtotal: ${formatUYU(subtotal)} ${discountAmount > 0 ? `(-${formatUYU(discountAmount)})` : ''} ${surcharge > 0 ? `(+${formatUYU(surcharge)})` : ''}`;
+  document.getElementById("modal-total-display").innerHTML = `${formatUYU(total)} <span class="font-sans text-xs text-slate-500 font-medium">UYU</span>`;
 
   if (appState.currentLead) {
     appState.currentLead.quotedServices = selectedServiceIds;
@@ -831,6 +2187,23 @@ function updateOperatorForLead() {
     appState.currentLead.assignedTo = document.getElementById("modal-assigned-operator").value;
     updatePreviewMessage();
   }
+}
+
+function confirmDeleteLead() {
+  const lead = appState.currentLead;
+  if (!lead) return;
+
+  openConfirmDeleteModal(
+    `¿Eliminar tasación de ${lead.name}?`,
+    "Se eliminará esta solicitud y, si tenía comisión asociada, también se quitará.",
+    () => {
+      appState.leads = appState.leads.filter(l => l.id !== lead.id);
+      closeModalCotizador();
+      saveAllAndSync();
+      renderAllViews();
+      showToast("Tasación eliminada");
+    }
+  );
 }
 
 // ================= PLANTILLAS DE WHATSAPP =================
@@ -855,7 +2228,7 @@ function updatePreviewMessage() {
     const tariff = appState.tariffs.find(t => t.id === id);
     if (!tariff) return "";
     const price = tariff.prices[category] || 0;
-    return `• *${tariff.shortName}:* $${price.toLocaleString('es-UY')} UYU`;
+    return `• *${tariff.shortName}:* ${formatUYU(price)} UYU`;
   }).filter(Boolean).join("\n");
 
   const itemsSummary = selectedServiceIds.map(id => {
@@ -881,7 +2254,7 @@ Recibimos tu consulta para tu *${lead.vehicle}* y con gusto te pasamos la cotiza
 ${itemsDetail}
 
 ⏱️ *Tiempo estimado de trabajo:* ${time}
-💰 *Total Final:* *${total > 0 ? '$' + total.toLocaleString('es-UY') + ' UYU' : 'A confirmar'}*
+💰 *Total Final:* *${total > 0 ? formatUYU(total) + ' UYU' : 'A confirmar'}*
 💳 *Formas de pago:* Efectivo, Transferencia o Tarjetas de Crédito / Débito.
 
 📍 *Ubicación del taller:* ${address}
@@ -893,7 +2266,7 @@ ${itemsDetail}
       message =
 `¡Hola ${lead.name}! 👋 Te saluda ${operator} de *${shopName}* (Shangrilá).
 
-Para tu *${lead.vehicle}*, el paquete completo de *${itemsSummary}* queda en un total de *$${total.toLocaleString('es-UY')} UYU*.
+Para tu *${lead.vehicle}*, el paquete completo de *${itemsSummary}* queda en un total de *${formatUYU(total)} UYU*.
 
 🎁 *Beneficio exclusivo:* Si confirmamos el turno en las próximas 48hs, te bonificamos sin costo el sellado y acondicionado protector de gomas y plásticos exteriores.
 
@@ -927,7 +2300,7 @@ Estamos cerrando la agenda de la semana y nos quedan los últimos cupos disponib
 
 🚗 *Vehículo:* ${lead.vehicle}
 🛠️ *Trabajo a realizar:* ${itemsSummary}
-💰 *Presupuesto acordado:* $${total.toLocaleString('es-UY')} UYU
+💰 *Presupuesto acordado:* ${formatUYU(total)} UYU
 📍 *Dirección:* ${address}
 
 ⚠️ *Recomendación:* Por favor retirar objetos personales de valor antes de ingresar el vehículo al taller.
@@ -939,7 +2312,6 @@ Estamos cerrando la agenda de la semana y nos quedan los últimos cupos disponib
   document.getElementById("modal-whatsapp-preview").value = message;
 }
 
-// ================= ACCIONES DE ENVÍO Y COPIADO =================
 function copyWhatsAppMessage() {
   const textarea = document.getElementById("modal-whatsapp-preview");
   textarea.select();
@@ -979,6 +2351,7 @@ function saveLeadQuoteOnly(overrideStatus) {
   const vehicleVal = document.getElementById("modal-lead-vehicle-input").value.trim();
   const notesVal = document.getElementById("modal-lead-notes-input").value.trim();
   const sourceVal = document.getElementById("modal-lead-source").value;
+  const finalStatus = overrideStatus || document.getElementById("modal-lead-status").value;
 
   lead.name = nameVal || (appState.isCreatingNewManual ? "Cliente en Taller" : "Cliente");
   lead.phone = phoneVal;
@@ -986,25 +2359,29 @@ function saveLeadQuoteOnly(overrideStatus) {
   lead.customerNotes = notesVal;
   lead.source = sourceVal;
   lead.category = document.getElementById("modal-car-category").value;
-  lead.status = overrideStatus || document.getElementById("modal-lead-status").value;
+  lead.status = finalStatus;
   lead.assignedTo = document.getElementById("modal-assigned-operator").value;
   lead.timeEstimate = document.getElementById("modal-time-estimate").value;
 
-  // Si es una tasación manual creada desde el botón, agregarla al tablero
+  if (finalStatus === "FINALIZADO" && !lead.completedAt) {
+    lead.completedAt = getTodayISO();
+  } else if (finalStatus !== "FINALIZADO") {
+    lead.completedAt = "";
+  }
+
   if (appState.isCreatingNewManual) {
     appState.leads.unshift(lead);
     appState.isCreatingNewManual = false;
   }
 
-  saveLeads();
-  renderLeads();
-  updateStats();
-  showToast("Tasación guardada en el tablero");
+  saveAllAndSync();
+  renderAllViews();
+  showToast("Tasación guardada y sincronizada");
 }
 
 function sanitizePhoneForWhatsApp(phoneRaw) {
   if (!phoneRaw) return "";
-  let digits = phoneRaw.replace(/\D/g, "");
+  let digits = String(phoneRaw).replace(/\D/g, "");
 
   if (digits.startsWith("09") && digits.length === 9) {
     digits = "598" + digits.substring(1);
@@ -1021,7 +2398,7 @@ function sanitizePhoneForWhatsApp(phoneRaw) {
 
 function formatPhoneForDisplay(phoneRaw) {
   if (!phoneRaw) return "Sin teléfono";
-  return phoneRaw.trim();
+  return String(phoneRaw).trim();
 }
 
 // ================= CONFIGURACIÓN DE TARIFARIO =================
@@ -1075,24 +2452,30 @@ function saveTarifario() {
 
   saveTariffs();
   closeModalTarifario();
-  showToast("Tarifario guardado correctamente");
+  showToast("Tarifario guardado y sincronizado");
   if (appState.currentLead) recalculateQuote();
 }
 
 function resetDefaultTarifario() {
-  if (confirm("¿Deseas restablecer las tarifas sugeridas originales?")) {
-    appState.tariffs = JSON.parse(JSON.stringify(DEFAULT_TARIFFS));
-    saveTariffs();
-    openTarifarioModal();
-    showToast("Tarifas restablecidas");
-  }
+  openConfirmDeleteModal(
+    "¿Restablecer tarifas originales?",
+    "Los precios base volverán a los valores iniciales sugeridos.",
+    () => {
+      appState.tariffs = JSON.parse(JSON.stringify(DEFAULT_TARIFFS));
+      saveTariffs();
+      openTarifarioModal();
+      showToast("Tarifas restablecidas");
+    }
+  );
 }
 
-// ================= MODAL AJUSTES Y NEGOCIO =================
+// ================= MODAL AJUSTES, PORCENTAJE DE COMISIÓN Y CLOUD =================
 function openSettingsModal() {
-  document.getElementById("setting-sheet-url").value = appState.config.sheetUrl;
-  document.getElementById("setting-shop-name").value = appState.config.shopName;
-  document.getElementById("setting-shop-address").value = appState.config.shopAddress;
+  document.getElementById("setting-script-url").value = appState.config.scriptUrl || "";
+  document.getElementById("setting-sheet-url").value = appState.config.sheetUrl || DEFAULT_CONFIG.sheetUrl;
+  document.getElementById("setting-shop-name").value = appState.config.shopName || "DetailVlak";
+  document.getElementById("setting-shop-address").value = appState.config.shopAddress || "";
+  document.getElementById("setting-commission-rate").value = appState.config.commissionRate ?? 30;
   document.getElementById("modal-settings").classList.remove("hidden");
 }
 
@@ -1101,27 +2484,79 @@ function closeModalSettings() {
 }
 
 function saveSettings() {
-  appState.config.sheetUrl = document.getElementById("setting-sheet-url").value.trim();
-  appState.config.shopName = document.getElementById("setting-shop-name").value.trim();
+  appState.config.scriptUrl = document.getElementById("setting-script-url").value.trim();
+  appState.config.sheetUrl = document.getElementById("setting-sheet-url").value.trim() || DEFAULT_CONFIG.sheetUrl;
+  appState.config.shopName = document.getElementById("setting-shop-name").value.trim() || "DetailVlak";
   appState.config.shopAddress = document.getElementById("setting-shop-address").value.trim();
+  appState.config.commissionRate = parseFloat(document.getElementById("setting-commission-rate").value) || 30;
 
   saveConfig();
+  renderAllViews();
   closeModalSettings();
   showToast("Configuración guardada");
   syncGoogleSheets();
 }
 
-function openSheetGuideModal() {
-  openSettingsModal();
+async function copyAppsScriptCode() {
+  try {
+    const resp = await fetch("google-apps-script.gs");
+    const code = await resp.text();
+    await navigator.clipboard.writeText(code);
+    const btnText = document.getElementById("btn-copy-gas-text");
+    if (btnText) {
+      btnText.innerText = "¡Código Copiado al Portapapeles!";
+      setTimeout(() => { btnText.innerText = "Copiar Código Google Apps Script"; }, 2500);
+    }
+    showToast("Código de Google Apps Script copiado");
+  } catch (err) {
+    showToast("Abrí el archivo google-apps-script.gs en la carpeta del proyecto", "error");
+  }
 }
 
 function loadSampleData() {
-  appState.leads = JSON.parse(JSON.stringify(SAMPLE_LEADS));
-  saveLeads();
-  renderLeads();
-  updateStats();
-  closeModalSettings();
-  showToast("5 consultas de prueba cargadas");
+  openConfirmDeleteModal(
+    "¿Restaurar datos de muestra?",
+    "Se cargarán las consultas y productos de ejemplo.",
+    () => {
+      appState.leads = JSON.parse(JSON.stringify(SAMPLE_LEADS));
+      appState.stock = JSON.parse(JSON.stringify(DEFAULT_STOCK));
+      saveAllAndSync();
+      renderAllViews();
+      closeModalSettings();
+      showToast("Datos de muestra cargados");
+    }
+  );
+}
+
+// ================= MODAL UNIVERSAL DE CONFIRMACIÓN =================
+let pendingDeleteCallback = null;
+
+function openConfirmDeleteModal(title, desc, onConfirm) {
+  setText("confirm-delete-title", title);
+  setText("confirm-delete-desc", desc);
+  pendingDeleteCallback = onConfirm;
+
+  const btn = document.getElementById("btn-confirm-delete-action");
+  if (btn) {
+    btn.onclick = () => {
+      if (typeof pendingDeleteCallback === "function") pendingDeleteCallback();
+      closeConfirmDeleteModal();
+    };
+  }
+
+  document.getElementById("modal-confirm-delete").classList.remove("hidden");
+  lucide.createIcons();
+}
+
+function closeConfirmDeleteModal() {
+  document.getElementById("modal-confirm-delete").classList.add("hidden");
+  pendingDeleteCallback = null;
+}
+
+// ================= HELPERS UI =================
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = val;
 }
 
 function showToast(message, type = "success") {
@@ -1136,5 +2571,5 @@ function showToast(message, type = "success") {
   setTimeout(() => {
     toast.classList.remove("translate-y-0", "opacity-100");
     toast.classList.add("translate-y-20", "opacity-0");
-  }, 2800);
+  }, 3000);
 }
